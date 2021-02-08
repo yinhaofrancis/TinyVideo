@@ -1,0 +1,24 @@
+{
+  "name": "TinyVideo",
+  "version": "0.1.0",
+  "summary": "A short description of TinyVideo.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/yinhaoFrancis/TinyVideo",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "yinhaoFrancis": "1833918721@qq.com"
+  },
+  "source": {
+    "git": "https://github.com/yinhaoFrancis/TinyVideo.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source_files": "TinyVideo/Classes/**/*",
+  "swift_versions": "5.0",
+  "swift_version": "5.0"
+}

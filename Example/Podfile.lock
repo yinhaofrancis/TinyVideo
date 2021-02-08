@@ -1,0 +1,16 @@
+PODS:
+  - TinyVideo (0.1.0)
+
+DEPENDENCIES:
+  - TinyVideo (from `../`)
+
+EXTERNAL SOURCES:
+  TinyVideo:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  TinyVideo: b9e28f187d6437d59894942cbcd62cbc14b1323f
+
+PODFILE CHECKSUM: 1c1601b996052811350842e79a580d713cc89caf
+
+COCOAPODS: 1.10.1

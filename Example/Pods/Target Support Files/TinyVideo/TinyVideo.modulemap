@@ -1,0 +1,6 @@
+framework module TinyVideo {
+  umbrella header "TinyVideo-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,6 @@
+framework module Pods_TinyVideo_Example {
+  umbrella header "Pods-TinyVideo_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}
