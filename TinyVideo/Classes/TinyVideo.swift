@@ -36,7 +36,11 @@ extension TinyVideoProcess {
         return CMSampleBufferGetImageBuffer(buffer)
     }
     func getPresentationTimeStamp(buffer:CMSampleBuffer)->CMTime{
-        return CMSampleBufferGetPresentationTimeStamp(buffer)
+        if #available(iOS 13.0, *) {
+            return buffer.presentationTimeStamp
+        } else {
+            return CMSampleBufferGetPresentationTimeStamp(buffer)
+        }
     }
     
 }
@@ -44,9 +48,10 @@ extension TinyVideoProcess {
 
 
 public protocol TinyFilter{
-    func filter(image: CIImage,transform:CGAffineTransform) -> CGImage?
-    var cicontext:CIContext { get }
+    func filter(image: CIImage,transform:CGAffineTransform,time:CMTime) -> CIImage?
+
     var screenSize:CGSize? {get set}
+    
 }
 extension TinyFilter{
     public func imageTransform(img:CIImage,gravity:CALayerContentsGravity,originRect:CGRect,target:CGSize)->CIImage{
@@ -69,7 +74,7 @@ extension TinyFilter{
     }
 }
 
-public class ChromeFilter:TinyFilter{
+public class DynamicGaussBackgroundFilter:TinyFilter{
     public var screenSize: CGSize?
     
     public var cicontext: CIContext
@@ -97,10 +102,11 @@ public class ChromeFilter:TinyFilter{
         }
         return nil
     }
-    public func filter(image: CIImage,transform:CGAffineTransform) -> CGImage? {
-        return autoreleasepool { () -> CGImage? in
+    public func filter(image: CIImage,transform:CGAffineTransform,time:CMTime) -> CIImage? {
+        return autoreleasepool { () -> CIImage? in
+            
             if let ctx = self.cgctx {
-//                ctx.context.saveGState()
+                ctx.context.saveGState()
                 if let ci = self.cacheImage{
                     ctx.draw(image: ci, mode: .resizeFill)
                 }else{
@@ -113,15 +119,44 @@ public class ChromeFilter:TinyFilter{
                 }
                 guard let ciimg = self.cicontext.createCGImage(image, from: image.extent) else { return nil }
                 ctx.draw(image: ciimg, mode: .resizeFit)
-//                ctx.context.restoreGState()
-                return self.cgctx?.render()
+                ctx.context.restoreGState()
+                guard let cgimg = self.cgctx?.render() else { return nil }
+                return CIImage(cgImage: cgimg)
             }else{
-                return self.cicontext.createCGImage(image, from: image.extent)
+                return image
             }
         }
         
     }
     
+}
+
+public class TinyFilterGroup:TinyFilter{
+    
+    public var screenSize: CGSize?{
+        didSet{
+            for i in 0 ..< self.filters.count {
+                self.filters[i].screenSize = self.screenSize
+            }
+        }
+    }
+    public init() {}
+    private var filters:[TinyFilter] = []
+    public func filter(image: CIImage, transform: CGAffineTransform,time:CMTime) -> CIImage? {
+        var current = image
+        var tranf = transform
+        for i in self.filters{
+            guard let last = i.filter(image: current, transform: tranf, time: time) else { return nil }
+            current = last
+            tranf = CGAffineTransform.identity
+        }
+        return current
+    }
+    public func addFilter(filter:TinyFilter){
+        var f = filter
+        self.filters.append(f)
+        f.screenSize = self.screenSize
+    }
 }
 
 
@@ -216,6 +251,9 @@ public class TinyCoreImageProcess:TinyVideoProcess{
         if outputSize.width == 0 || outputSize.height == 0{
             self.outputSize = size
         }
+        if(self.filter.screenSize == nil){
+            self.filter.screenSize = size
+        }
     }
     
 
@@ -236,7 +274,9 @@ public class TinyCoreImageProcess:TinyVideoProcess{
         let origin = autoreleasepool { () -> CIImage in
             CIImage(cvImageBuffer: pixel).transformed(by: transform).transformed(by: transform).transformed(by: transform)
         }
-        guard let cgresult = self.filter.filter(image: origin,transform: transform) else { return nil }
+        
+        guard let ciresult = self.filter.filter(image: origin,transform: transform,time:self.getPresentationTimeStamp(buffer: buffer)) else { return nil }
+        guard let cgresult = self.ctx.createCGImage(ciresult, from: ciresult.extent) else { return nil }
         guard let resultpb = TinyDrawContext.createPixelBuffer(content: cgresult) else { return nil }
 
         return (resultpb,self.getPresentationTimeStamp(buffer: buffer))
