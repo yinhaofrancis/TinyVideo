@@ -49,15 +49,15 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     func process(url:URL){
         let filter = TinyFilterGroup()
         filter.addFilter(filter: DynamicGaussBackgroundFilter())
-        filter.addFilter(filter: koo())
+        filter.addFilter(filter: koo(string: NSAttributedString(string: "dsasds", attributes: [.font:UIFont.systemFont(ofSize: 20),.foregroundColor:UIColor.white]), frame: CGRect(x:20,y:20,width: 100,height: 24)))
         let process = TinyCoreImageProcess(filter: filter)
         
         do {
             let outUrl = try self.filecreate(name: "a", ext: "mp4")
             let input = try TinyAssetVideoProcessInput(asset: AVAsset(url: url))
             let output = try TinyAssetVideoProcessOut(url: outUrl, type: .mp4)
-//            output.setSourceSize(size: CGSize(width: UIScreen.main.bounds.size.width * UIScreen.main.scale, height: UIScreen.main.bounds.size.height * UIScreen.main.scale))
-//            filter.screenSize = UIScreen.main.bounds.size
+            output.setSourceSize(size: CGSize(width: UIScreen.main.bounds.size.width * UIScreen.main.scale, height: UIScreen.main.bounds.size.height * UIScreen.main.scale))
+            filter.screenSize = UIScreen.main.bounds.size
             self.session = TinyVideoSession(input: input, out: output, process: process)
             self.session?.run { [weak self]i in
                 if i == nil{
@@ -107,21 +107,24 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     }
 }
 
-
-class koo: TinyFilter {
-    func filter(image: CIImage, transform: CGAffineTransform,time:CMTime) -> CIImage? {
+public class koo: TinyFilter {
+    public func filter(image: CIImage, transform: CGAffineTransform,time:CMTime) -> CIImage? {
         autoreleasepool { () -> CIImage? in
+            
             guard let ctxt = self.cgctx else { return nil }
+            
             guard let cg = cictx.createCGImage(image.transformed(by: transform), from: image.extent) else { return nil }
+            
             ctxt.draw(image: cg, mode: .resizeFill)
-            let txt = NSAttributedString(string: "hgjgjhg", attributes: [
-                .foregroundColor:UIColor.white,.font:UIFont.systemFont(ofSize: 20)
-            ])
-            let fs = CTFramesetterCreateWithAttributedString(txt as CFAttributedString)
-            let text = CTFramesetterCreateFrame(fs, CFRangeMake(0, 7), CGPath(rect: CGRect(x: 0, y: 0, width: 200, height: 24), transform: nil), nil)
+            
+            let fs = CTFramesetterCreateWithAttributedString(self.text as CFAttributedString)
+        
+            let text = CTFramesetterCreateFrame(fs, CFRangeMake(0, self.text.length), CGPath(rect: self.frame, transform: nil), nil)
+            
             CTFrameDraw(text, ctxt.context)
+            
             guard let img = self.cgctx?.context.makeImage() else { return nil }
-            print(time.seconds,time)
+            
             return CIImage(cgImage: img)
         }
     }
@@ -130,7 +133,16 @@ class koo: TinyFilter {
         let context = TinyDrawContext(width: Int(rect.width), height: Int(rect.height), bytesPerRow: Int(rect.width * 4), buffer: nil)
         return context
     }()
-    var screenSize: CGSize?
+    
+    public init(string:NSAttributedString,frame:CGRect) {
+        self.text = string
+        self.frame = frame
+    }
+    public var screenSize: CGSize?
     
     var cictx:CIContext = CIContext()
+    
+    public var text:NSAttributedString
+    
+    public var frame:CGRect
 }
