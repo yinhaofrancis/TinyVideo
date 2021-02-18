@@ -43,15 +43,15 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         super.didReceiveMemoryWarning()
 
     }
-    
+
     var session:TinyVideoSession?
-    
+
     func process(url:URL){
         let filter = TinyFilterGroup()
         filter.addFilter(filter: DynamicGaussBackgroundFilter())
         filter.addFilter(filter: koo(string: NSAttributedString(string: "dsasds", attributes: [.font:UIFont.systemFont(ofSize: 20),.foregroundColor:UIColor.white]), frame: CGRect(x:20,y:20,width: 100,height: 24)))
         let process = TinyCoreImageProcess(filter: filter)
-        
+
         do {
             let outUrl = try self.filecreate(name: "a", ext: "mp4")
             let input = try TinyAssetVideoProcessInput(asset: AVAsset(url: url))
@@ -68,10 +68,8 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         } catch  {
             print(error)
         }
-        
-        
     }
-    
+
     func play(url:URL) {
         DispatchQueue.main.async {
             let play = AVPlayerViewController()
@@ -87,8 +85,6 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         }
         return outUrl
     }
-    
-    
     @IBAction func pickImage(_ sender: Any) {
         let a = UIImagePickerController()
         a.sourceType = .photoLibrary
@@ -96,7 +92,6 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         a.delegate = self
         a.videoQuality = .typeHigh
         a.allowsEditing = false
-        
         a.delegate = self
         self.present(a, animated: true, completion: nil)
     }

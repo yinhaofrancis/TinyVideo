@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vzc-l3-jd5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vzc-l3-jd5">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
         <scene sceneID="ufC-wZ-h7g">
             <objects>
-                <viewController id="vXZ-lx-hvc" customClass="ViewController" customModule="TinySocket_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="vXZ-lx-hvc" customClass="ViewController" customModule="TinyVideo_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="jyV-Pf-zRb"/>
                         <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
@@ -26,11 +27,61 @@
                                 <action selector="pickImage:" destination="vXZ-lx-hvc" id="jUz-FR-PkF"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="track" id="6cf-7m-zK7">
+                            <connections>
+                                <segue destination="lhk-jk-bwh" kind="show" id="ix1-gI-rBG"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="976.79999999999995" y="91.304347826086968"/>
+        </scene>
+        <!--Mark View Controller-->
+        <scene sceneID="wfI-GH-1S2">
+            <objects>
+                <viewController id="lhk-jk-bwh" customClass="MarkViewController" customModule="TinyVideo_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="O0c-j0-Wp8"/>
+                        <viewControllerLayoutGuide type="bottom" id="UYs-eH-ooH"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="gfj-kI-wav">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="MF0-sc-1Yt">
+                                <rect key="frame" x="0.0" y="193" width="375" height="281"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="MF0-sc-1Yt" secondAttribute="height" multiplier="4:3" id="ypJ-MM-tRl"/>
+                                </constraints>
+                            </imageView>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="30" translatesAutoresizingMaskIntoConstraints="NO" id="Skh-7U-uNl">
+                                <rect key="frame" x="24" y="627" width="327" height="31"/>
+                                <connections>
+                                    <action selector="call:" destination="lhk-jk-bwh" eventType="valueChanged" id="YQM-Al-ceO"/>
+                                </connections>
+                            </slider>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="UYs-eH-ooH" firstAttribute="top" secondItem="Skh-7U-uNl" secondAttribute="bottom" constant="10" id="BIP-8e-0oD"/>
+                            <constraint firstAttribute="trailing" secondItem="MF0-sc-1Yt" secondAttribute="trailing" id="Ldm-Ws-AMp"/>
+                            <constraint firstItem="Skh-7U-uNl" firstAttribute="leading" secondItem="gfj-kI-wav" secondAttribute="leadingMargin" constant="10" id="P72-Eh-yzj"/>
+                            <constraint firstItem="MF0-sc-1Yt" firstAttribute="centerY" secondItem="gfj-kI-wav" secondAttribute="centerY" id="bBG-jZ-bWK"/>
+                            <constraint firstItem="MF0-sc-1Yt" firstAttribute="centerX" secondItem="gfj-kI-wav" secondAttribute="centerX" id="mf5-BA-xPa"/>
+                            <constraint firstItem="MF0-sc-1Yt" firstAttribute="leading" secondItem="gfj-kI-wav" secondAttribute="leading" id="scI-xJ-bIc"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Skh-7U-uNl" secondAttribute="trailing" constant="10" id="wIu-Vu-dOm"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="Rdr-fg-A7I"/>
+                    <connections>
+                        <outlet property="img" destination="MF0-sc-1Yt" id="JMg-sh-Q7R"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="k5C-GL-FCZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1861.5999999999999" y="90.404797601199405"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="bBN-77-jCD">
@@ -51,4 +102,9 @@
             <point key="canvasLocation" x="37.600000000000001" y="91.304347826086968"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>
