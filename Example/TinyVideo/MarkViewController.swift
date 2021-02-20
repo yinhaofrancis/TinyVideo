@@ -30,8 +30,12 @@ class MarkViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         a.allowsEditing = false
         a.delegate = self
         self.present(a, animated: true, completion: nil)
-        
-        
+        do {
+        let tiny = try TinyComputer()
+        print(tiny)
+        }catch{
+            print(error)
+        }
     }
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
