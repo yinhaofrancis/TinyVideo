@@ -98,7 +98,7 @@ public class TinyComputer{
     
     
     
-    public func compute(name:String,threadGridSize:MTLSize? = nil,threadsPerThreadgroup:MTLSize? = nil,buffers:[MTLBuffer] = [],textures:[MTLTexture] = []) throws{
+    public func compute(name:String,pixelSize:MTLSize? = nil,buffers:[MTLBuffer] = [],textures:[MTLTexture] = []) throws{
         try self.startEncoder(name: name,callback: { (encoder) in
             
             
@@ -106,10 +106,23 @@ public class TinyComputer{
                 encoder .setTextures(textures, range: 0 ..< textures.count)
             }
             if(buffers.count > 0){
-                encoder.setBuffers(buffers, offsets: (0 ..< buffers.count).map({_ in 0}), range: 0 ..< buffers.count)
+                if(pixelSize?.width != nil){
+
+                    encoder.setBuffers(buffers, offsets: (0 ..< buffers.count).map({_ in 0}), range: 1 ..< buffers.count + 1)
+                }else{
+                    encoder.setBuffers(buffers, offsets: (0 ..< buffers.count).map({_ in 0}), range: 0 ..< buffers.count)
+                }
+                
             }
-            if let gsize = threadGridSize,let tpt = threadsPerThreadgroup{
-                encoder.dispatchThreadgroups(gsize, threadsPerThreadgroup: tpt)
+            if let gsize = pixelSize{
+                let max = Int(sqrt(Double(self.device.maxThreadsPerThreadgroup.width)))
+                let x = Int(ceil(Float(gsize.width) / Float(max)))
+                let y = Int(ceil(Float(gsize.height) / Float(max)))
+                let s = MTLSize(width: x, height: y, depth: 1)
+                var grid = simd_uint2(x: UInt32(x), y: UInt32(y))
+                encoder.setBytes(&grid, length: MemoryLayout<simd_int2>.size, index: 0)
+                encoder.dispatchThreadgroups(s, threadsPerThreadgroup: MTLSize(width: max, height: max, depth: 1))
+                
             }
             encoder.endEncoding()
         })
@@ -229,7 +242,7 @@ public class TinyRender {
         pipelineDesc.colorAttachments[0].pixelFormat = .bgra8Unorm_srgb
         self.pipelineDescriptor = pipelineDesc
     }
-    public var screenSize:ScreenSize = ScreenSize(w: 320, h: 480)
+    public var screenSize:ScreenSize = ScreenSize(w: 320 * Float(UIScreen.main.scale), h: 480 * Float(UIScreen.main.scale))
     
     public var ortho:float4x4{
         return float4x4(columns: (
@@ -277,7 +290,7 @@ public class TinyRender {
         let pipelinestate = try configuration.device.makeRenderPipelineState(descriptor: self.pipelineDescriptor)
         encoder.setRenderPipelineState(pipelinestate)
         encoder.setVertexBuffer(self.vertice, offset: 0, index: 0)
-        encoder.setVertexBuffer(self.orthoBuffer, offset: 0, index: 1)
+        encoder.setVertexBytes(&(self.screenSize), length: MemoryLayout<ScreenSize>.size, index: 1)
         encoder.setFragmentTexture(texture, index: 0)
         if let indexb = self.indexVertice{
             encoder.drawIndexedPrimitives(type: .triangleStrip, indexCount: rectangleIndex.count, indexType: .uint32, indexBuffer: indexb, indexBufferOffset: 0)

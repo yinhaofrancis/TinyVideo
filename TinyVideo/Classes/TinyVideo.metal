@@ -11,10 +11,10 @@ struct TinyVertex{
 
 vertex TinyVertex vertexShader(uint vertexID [[vertex_id]],
              constant TinyVertex *vertices [[buffer(0)]],
-             constant float4x4 *projection [[buffer(1)]]){
+             constant float2 *size [[buffer(1)]]){
     TinyVertex r;
-    float4x4 m = *projection;
-    r.location = m * vertices[vertexID].location;
+    
+    r.location = float4(vertices[vertexID].location.x / size[0].x * 2,vertices[vertexID].location.y / size[0].y * 2 ,0,1);
     r.textureVX = vertices[vertexID].textureVX;
     return r;
 }
@@ -67,7 +67,7 @@ kernel void imageScale(const texture2d<half, access::sample> from [[texture(0)]]
 
 kernel void imageScaleToFit(const texture2d<half, access::sample> from [[ texture(0) ]],
                             texture2d<half, access::write> to [[texture(1)]],
-                            device const float* scale [[buffer(0)]],
+                            device const uint2* scale [[buffer(0)]],
                             uint2 gid [[thread_position_in_grid]])
 {
     float rw = from.get_width() / to.get_width();
@@ -84,22 +84,28 @@ kernel void imageScaleToFit(const texture2d<half, access::sample> from [[ textur
             r = 1 / rh;
         }
     }
-    float g = scale[0];
+    uint2 grid = uint2(1,1);
     constexpr sampler imgSample;
     uint2 targetSize = uint2(from.get_width() * r,from.get_height() * r);
-    for (uint i = 0 ; i < g; i++){
-        for (uint j = 0 ; j < g; j++){
-            float2 location = createSampleCood(gid, targetSize.x, targetSize.y, i, j, uint2(g,g));
+//    for (uint i = 0 ; i < grid.x; i++){
+//        for (uint j = 0 ; j < grid.y; j++){
+//            float2 location = createSampleCood(gid, targetSize.x, targetSize.y, i, j, grid);
 //            half4 color = from.sample(imgSample, location);
+////
+//            uint x = (to.get_width() - targetSize.x) / 2 + (gid.x * grid.x + i);
+//            uint y = (to.get_height() - targetSize.y) / 2 + (gid.y * grid.y + j);
+//            uint2 start = uint2(x,y);
+//            to.write(color, uint2(gid.x * grid.x + i,gid.y * grid.y + j));
+//        }
+//    }
 //
-            uint x = (to.get_width() - targetSize.x) / 2 + (gid.x * g + i);
-            uint y = (to.get_height() - targetSize.y) / 2 + (gid.y * g + j);
-            uint2 start = uint2(x,y);
-            to.write(half4(0,1,0,1), uint2(gid.x * g + i,gid.y * g + j));
-        }
-    }
-    
-    
+    float2 location = createSampleCood(gid, targetSize.x, targetSize.y, 0, 0, grid);
+    half4 color = from.sample(imgSample, location);
+//
+//    uint x = (to.get_width() - targetSize.x) / 2 + (gid.x * grid.x + i);
+//    uint y = (to.get_height() - targetSize.y) / 2 + (gid.y * grid.y + j);
+//    uint2 start = uint2(x,y);
+    to.write(color, uint2(gid.x,gid.y));
     
     
     
