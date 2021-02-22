@@ -10,56 +10,56 @@ import UIKit
 import MobileCoreServices
 import AVFoundation
 import TinyVideo
+import MetalKit
+import MetalPerformanceShaders
 
 class MarkViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate {
 
     @IBAction func call(_ sender: UISlider) {
         self.call(i: sender.value)
     }
-    @IBOutlet weak var img: UIImageView!
+    @IBOutlet weak var img: MTKView!
+    let tiny = try! TinyComputer()
     var asset:AVAsset?
     var ctx:TinyVideoContext = TinyVideoContext(size: CGSize(width: 200, height: 200))
     var track:TinyVideoTrack?
+    var render:TinyRender?
+    
+    var blur:MPSImageGaussianBlur!
     override func viewDidLoad() {
         super.viewDidLoad()
-//        let a = UIImagePickerController()
-//        a.sourceType = .photoLibrary
-//        a.mediaTypes = [kUTTypeMovie as String]
-//        a.delegate = self
-//        a.videoQuality = .typeHigh
-//        a.allowsEditing = false
-//        a.delegate = self
-//        self.present(a, animated: true, completion: nil)
-//        do {
-        let tiny = try! TinyComputer()
-        try! tiny.begin()
-        let buffera = tiny.createBuffer(size: 10 * MemoryLayout<Float>.size)!
-        let bufferb = tiny.createBuffer(size: 10 * MemoryLayout<Float>.size)!
-        let bufferr = tiny.createBuffer(size: 10 * MemoryLayout<Float>.size)!
-        
-        loadbuffer(buffer: buffera)
-        loadbuffer(buffer: bufferb)
-        
-        try! tiny.compute(name: "add_arrays", threadGridSize: MTLSize(width: 10, height: 1, depth: 1),buffers: buffera,bufferb,bufferr)
-        
-        try! tiny.commit()
-        
-        showBuffer(buffer: bufferr)
-        
+        let a = UIImagePickerController()
+        a.sourceType = .photoLibrary
+        a.mediaTypes = [kUTTypeMovie as String]
+        a.delegate = self
+        a.videoQuality = .typeHigh
+        a.allowsEditing = false
+        a.delegate = self
+        self.present(a, animated: true, completion: nil)
+        let buffa = self.tiny.createBuffer(data: [Float(1.0),Float(2.0),Float(4.0)])
+        let buffb = self.tiny.createBuffer(data: [Float(1.5),Float(2.5),Float(4.5)])
+        let buc = self.tiny.createBuffer(size: MemoryLayout<Float>.size * 3)
+        try! self.tiny.configuration.begin()
+        try! self.tiny.compute(name: "add_arrays", threadGridSize: MTLSize(width: 1, height: 1, depth: 1), threadsPerThreadgroup: MTLSize(width: 10, height: 1, depth: 1), buffers: [buffa!,buffb!,buc!], textures: [])
+        try! self.tiny.configuration.commit()
+        self.showBuffer(buffer: buc!)
+        self.blur = MPSImageGaussianBlur(device: self.tiny.device, sigma: 2)
+        self.img.device = self.tiny.configuration.device
+        self.render = TinyRender(configuration: self.tiny.configuration)
     }
 
     func loadbuffer(buffer:MTLBuffer){
         let a = buffer.contents()
-        for i in 0 ..< 10 {
+        for i in 0 ..< 3 {
             let f = Float(i)
-//            print(f)
+            print(f)
             a.storeBytes(of: f, toByteOffset: i * MemoryLayout<Float>.size, as: Float.self)
         }
     }
     
     func showBuffer(buffer:MTLBuffer){
         let r = buffer.contents()
-        for i in 0 ..< 10 {
+        for i in 0 ..< 3 {
             let f = r.load(fromByteOffset: i * MemoryLayout<Float>.size, as: Float.self)
             print(f)
         }
@@ -73,14 +73,27 @@ class MarkViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         self.call(i: 0)
     }
     func call(i:Float){
-        let c = ctx.exportFrame(time: CMTime(seconds: Double(i), preferredTimescale: .max)) { (t, c) in
-            guard let cv = self.track?.nextSampleBuffer(current: t) else { return }
-
-            c.drawImage(pixel: cv, frame: CGRect(x: 0, y: 0, width: 200, height: 200))
-        }!
-        let i = UIImage(cgImage: c)
-        self.img.image = i
+        var img:CIImage?
+        let grid:Float = 50
         
+        ctx.exportFrame(time: CMTime(seconds: Double(i), preferredTimescale: .max)) { (t, c) in
+            guard let cv = self.track?.nextSampleBuffer(current: t) else { return }
+            let temp:[Float] = [grid];
+            let d = self.tiny.createBuffer(data: temp)
+            let px1 = self.tiny.createTexture(img: cv)
+            try! self.render?.configuration.begin()
+            try! self.render?.render(texture: px1!, renderPass: self.img.currentRenderPassDescriptor!, drawable: self.img.currentDrawable!)
+            try! self.render?.configuration.commit()
+            
+//            let w = Int(Double(CVPixelBufferGetWidth(cv)) * 0.8)
+//            let h = Int(Double(CVPixelBufferGetHeight(cv)) * 1.2)
+//            let px2 = self.tiny.createTexture(width: w, height: h)
+//            let px3 = self.tiny.createTexture(width: w, height: h)
+//            try! self.tiny.configuration.begin()
+//            try! self.tiny.compute(name: "imageScaleToFit",threadGridSize: MTLSizeMake(Int(grid), Int(grid), 1),threadsPerThreadgroup: MTLSize(width: Int(ceil(Double(w) / Double(grid))) , height: Int(ceil(Double(h) / Double(grid))), depth: 1),buffers: [d!],textures: [px1!,px2!])
+////            self.blur.encode(commandBuffer: self.tiny.commandbuffer!, sourceTexture: self.img.currentDrawable!.texture, destinationTexture: px3!)
+//            try! self.tiny.configuration.commit()
+        }
         
     }
 }

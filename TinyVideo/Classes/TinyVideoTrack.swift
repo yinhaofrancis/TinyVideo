@@ -22,7 +22,7 @@ extension CMSampleBuffer{
 
 public protocol TinyVideoTrack{
     
-    func nextSampleBuffer(current: CMTime) -> CIImage?
+    func nextSampleBuffer(current: CMTime) -> CVPixelBuffer?
     
     func finish()
     
@@ -73,33 +73,28 @@ public class TinyAssetVideoTrack:TinyVideoTrack{
     var currentRange:CMTimeRange
     var reader:AVAssetReader
     
-    public func nextSampleBuffer(current: CMTime) -> CIImage? {
-        autoreleasepool { () -> CIImage? in
-            if(current > self.during || current < .zero){
-                return nil
-            }
-            let time:CMTime = current - self.startTime
-            if self.last == nil{
-                self.last = self.videoOutput.copyNextSampleBuffer()
-            }
-            
-            if self.next == nil{
+    public func nextSampleBuffer(current: CMTime) -> CVPixelBuffer? {
+        if(current > self.during || current < .zero){
+            return nil
+        }
+        let time:CMTime = current - self.startTime
+        if self.last == nil{
+            self.last = self.videoOutput.copyNextSampleBuffer()
+        }
+        
+        if self.next == nil{
+            self.next = self.videoOutput.copyNextSampleBuffer()
+        }
+        if let l = self.last , let n = self.next {
+            if l.currentTime <= time && n.currentTime > time{
+                return CMSampleBufferGetImageBuffer(l)
+            }else{
+                self.last = n
                 self.next = self.videoOutput.copyNextSampleBuffer()
+                return self.nextSampleBuffer(current: current)
             }
-            if let l = self.last , let n = self.next {
-                if l.currentTime <= time && n.currentTime > time{
-                    if let px = CMSampleBufferGetImageBuffer(l){
-                        return CIImage(cvPixelBuffer: px).transformed(by: self.transform).transformed(by: self.transform).transformed(by: self.transform)
-                    }
-                    return nil
-                }else{
-                    self.last = n
-                    self.next = self.videoOutput.copyNextSampleBuffer()
-                    return self.nextSampleBuffer(current: current)
-                }
-            }else {
-                return nil
-            }
+        }else {
+            return nil
         }
     }
     
