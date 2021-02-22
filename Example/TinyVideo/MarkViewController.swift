@@ -22,22 +22,48 @@ class MarkViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     var track:TinyVideoTrack?
     override func viewDidLoad() {
         super.viewDidLoad()
-        let a = UIImagePickerController()
-        a.sourceType = .photoLibrary
-        a.mediaTypes = [kUTTypeMovie as String]
-        a.delegate = self
-        a.videoQuality = .typeHigh
-        a.allowsEditing = false
-        a.delegate = self
-        self.present(a, animated: true, completion: nil)
-        do {
-        let tiny = try TinyComputer()
-        print(tiny)
-        }catch{
-            print(error)
-        }
+//        let a = UIImagePickerController()
+//        a.sourceType = .photoLibrary
+//        a.mediaTypes = [kUTTypeMovie as String]
+//        a.delegate = self
+//        a.videoQuality = .typeHigh
+//        a.allowsEditing = false
+//        a.delegate = self
+//        self.present(a, animated: true, completion: nil)
+//        do {
+        let tiny = try! TinyComputer()
+        try! tiny.begin()
+        let buffera = tiny.createBuffer(size: 10 * MemoryLayout<Float>.size)!
+        let bufferb = tiny.createBuffer(size: 10 * MemoryLayout<Float>.size)!
+        let bufferr = tiny.createBuffer(size: 10 * MemoryLayout<Float>.size)!
+        
+        loadbuffer(buffer: buffera)
+        loadbuffer(buffer: bufferb)
+        
+        try! tiny.compute(name: "add_arrays", threadGridSize: MTLSize(width: 10, height: 1, depth: 1),buffers: buffera,bufferb,bufferr)
+        
+        try! tiny.commit()
+        
+        showBuffer(buffer: bufferr)
+        
     }
 
+    func loadbuffer(buffer:MTLBuffer){
+        let a = buffer.contents()
+        for i in 0 ..< 10 {
+            let f = Float(i)
+//            print(f)
+            a.storeBytes(of: f, toByteOffset: i * MemoryLayout<Float>.size, as: Float.self)
+        }
+    }
+    
+    func showBuffer(buffer:MTLBuffer){
+        let r = buffer.contents()
+        for i in 0 ..< 10 {
+            let f = r.load(fromByteOffset: i * MemoryLayout<Float>.size, as: Float.self)
+            print(f)
+        }
+    }
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true, completion: nil)
         guard let u = info[.mediaURL] as? URL else { return }
