@@ -20,27 +20,21 @@ extension CMSampleBuffer{
     }
 }
 
-public protocol TinyVideoTrack{
+public class TinyAssetVideoTrack{
     
-    func nextSampleBuffer(current: CMTime) -> CVPixelBuffer?
+    public var videoFrameRate:Int = 30
+    public var videoBitRate:Double = 5 * 1024 * 1024
+    public var audioSampleRate:Double = 44100
+    public var audioBitRate:Double = 64000
+    public var numberOfChannel:Int = 2
     
-    func finish()
+    private var group = DispatchGroup()
+    private var queue = DispatchQueue(label: "TinyAssetVideoTrack")
     
-    func ready()
+    public func nextSampleBuffer() -> CVPixelBuffer? {
+        self.nextSampleBuffer(curr: nil)
+    }
     
-    var size:CGSize { get }
-    
-    var during:CMTime { get }
-    
-    var audioMix:AVAudioMix? { get }
-    
-    var startTime:CMTime { get }
-    
-    var transform:CGAffineTransform { get }
-    
-}
-
-public class TinyAssetVideoTrack:TinyVideoTrack{
     
     public var transform: CGAffineTransform{
         self.videoOutput.track.preferredTransform
@@ -56,7 +50,8 @@ public class TinyAssetVideoTrack:TinyVideoTrack{
     
     
     public func finish() {
-        self.videoOutput.markConfigurationAsFinal()
+        self.reader.cancelReading()
+        self.writer?.cancelWriting()
     }
     
     
@@ -72,30 +67,38 @@ public class TinyAssetVideoTrack:TinyVideoTrack{
     }
     var currentRange:CMTimeRange
     var reader:AVAssetReader
+    var writer:AVAssetWriter?
+    public var filter:TinyMetalFilter?
     
-    public func nextSampleBuffer(current: CMTime) -> CVPixelBuffer? {
-        if(current > self.during || current < .zero){
-            return nil
-        }
-        let time:CMTime = current - self.startTime
-        if self.last == nil{
-            self.last = self.videoOutput.copyNextSampleBuffer()
+    private func nextSampleBuffer(curr: CMTime? = nil) -> CVPixelBuffer? {
+        if let current = curr{
+            if(current > self.during || current < .zero){
+                return nil
+            }
+            let time:CMTime = current - self.startTime
+            if self.last == nil{
+                self.last = self.videoOutput.copyNextSampleBuffer()
+            }
+            
+            if self.next == nil{
+                self.next = self.videoOutput.copyNextSampleBuffer()
+            }
+            if let l = self.last , let n = self.next {
+                if l.currentTime <= time && n.currentTime > time{
+                    return CMSampleBufferGetImageBuffer(l)
+                }else{
+                    self.last = n
+                    self.next = self.videoOutput.copyNextSampleBuffer()
+                    return self.nextSampleBuffer(curr: current)
+                }
+            }else {
+                return nil
+            }
+        }else{
+            guard let samp = self.videoOutput.copyNextSampleBuffer() else { return nil }
+            return CMSampleBufferGetImageBuffer(samp)
         }
         
-        if self.next == nil{
-            self.next = self.videoOutput.copyNextSampleBuffer()
-        }
-        if let l = self.last , let n = self.next {
-            if l.currentTime <= time && n.currentTime > time{
-                return CMSampleBufferGetImageBuffer(l)
-            }else{
-                self.last = n
-                self.next = self.videoOutput.copyNextSampleBuffer()
-                return self.nextSampleBuffer(current: current)
-            }
-        }else {
-            return nil
-        }
     }
     
     public var during: CMTime{
@@ -118,7 +121,6 @@ public class TinyAssetVideoTrack:TinyVideoTrack{
             kCVPixelBufferPixelFormatTypeKey as String:kCVPixelFormatType_32BGRA
         ]
         self.videoOutput = AVAssetReaderTrackOutput(track: track, outputSettings: videoSetting)
-//        self.videoOutput.supportsRandomAccess = true
 
         self.reader.add(self.videoOutput)
         
@@ -128,11 +130,120 @@ public class TinyAssetVideoTrack:TinyVideoTrack{
         let audioSetting:[String:Any] = [AVFormatIDKey:kAudioFormatLinearPCM]
 
         self.audioOutput = AVAssetReaderAudioMixOutput(audioTracks: atrack, audioSettings: audioSetting)
-//        self.audioOutput.supportsRandomAccess = true
        
         self.currentRange = CMTimeRange(start: .zero, duration: .zero)
+        self.reader.add(audioOutput)
     }
     
+    public func export(w:UInt,h:UInt,callback:@escaping (URL?,AVAssetWriter.Status)->Void) throws{
+        
+        let url = try TinyAssetVideoTrack.fileCreate(name: "a", ext: "mp4")
+        self.ready()
+        if(FileManager.default.fileExists(atPath: url.path)){
+            try! FileManager.default.removeItem(at: url)
+        }
+        
+        self.writer = try AVAssetWriter(url: url, fileType: .mp4)
+        let compress:[String:Any] = [
+            AVVideoAverageBitRateKey:self.videoBitRate,
+            AVVideoExpectedSourceFrameRateKey:self.videoFrameRate,
+            AVVideoProfileLevelKey:AVVideoProfileLevelH264HighAutoLevel
+        ]
+        
+        var vset:[String:Any] = [
+            AVVideoWidthKey:w,
+            AVVideoHeightKey:h,
+            AVVideoCompressionPropertiesKey:compress,
+        ]
+        if #available(iOS 11.0, *) {
+            
+            vset[AVVideoCodecKey] = AVVideoCodecType.h264.rawValue
+        } else {
+            vset[AVVideoCodecKey] = AVVideoCodecH264
+            // Fallback on earlier versions
+        }
+        guard let videoTracks = loadAsset(type: .video, setting: vset)  else { throw NSError(domain: "video config fail", code: 0, userInfo: nil)}
+        let videoTracksAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoTracks, sourcePixelBufferAttributes: nil)
+        
+        let dic = [
+            AVFormatIDKey : kAudioFormatMPEG4AAC,
+            AVEncoderBitRateKey:self.audioBitRate,
+            AVSampleRateKey:self.audioSampleRate,
+            AVNumberOfChannelsKey:self.numberOfChannel
+        ] as [String : Any]
+        
+        let audioTracks = loadAsset(type: .audio, setting: dic)
+        self.writer?.startWriting()
+        self.writer?.startSession(atSourceTime: .zero)
+        self.group.enter()
+        var videoEnd = false
+        var audioEnd = false
+        videoTracks.requestMediaDataWhenReady(on: self.queue) {
+            while (!videoEnd && videoTracks.isReadyForMoreMediaData){
+                if let sampleBuffer = self.videoOutput.copyNextSampleBuffer(){
+                    if let pixelbff = CMSampleBufferGetImageBuffer(sampleBuffer){
+                        if let pf = self.filter{
+                            if let p = pf.filter(pixel: pixelbff){
+                                videoTracksAdaptor.append(p, withPresentationTime: CMSampleBufferGetPresentationTimeStamp(sampleBuffer))
+                                continue
+                            }
+                        }else{
+                            videoTracks.append(sampleBuffer)
+                            continue
+                        }
+                    }
+                    
+                }else{
+                    videoEnd = true
+                    break
+                }
+            }
+            if videoEnd{
+                videoTracks.markAsFinished()
+                self.group.leave()
+            }
+        };
+        self.group.enter()
+        audioTracks?.requestMediaDataWhenReady(on: self.queue) {
+            while (!audioEnd && audioTracks!.isReadyForMoreMediaData){
+                if let sampleBuffer = self.audioOutput.copyNextSampleBuffer(){
+                    audioTracks?.append(sampleBuffer)
+                    continue
+                }else{
+                    audioEnd = true
+                    break
+                }
+            }
+            if audioEnd{
+                audioTracks?.markAsFinished()
+                self.group.leave()
+            }
+        }
+        self.group.notify(queue: DispatchQueue.global(), execute: {
+            self.writer?.finishWriting {
+                callback(url,self.writer!.status)
+                self.finish()
+            }
+        })
+    }
+    
+    class func fileCreate(name:String,ext:String) throws->URL{
+        let outUrl = try FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent(name).appendingPathExtension(ext)
+        if FileManager.default.fileExists(atPath: outUrl.path){
+            try FileManager.default.removeItem(at: outUrl)
+        }
+        return outUrl
+    }
+    
+    func loadAsset(type:AVMediaType,setting:[String:Any]?)->AVAssetWriterInput?{
+        guard let w = self.writer else { return nil }
+        let a = AVAssetWriterInput(mediaType: type, outputSettings: setting)
+        if(w.canAdd(a)){
+            w.add(a)
+            return a
+        }
+        return nil
+    }
     public var startTime:CMTime = .zero
 }
 
@@ -148,34 +259,4 @@ public class TinyAudioMixer{
         let all = AVMutableAudioMix()
         all.inputParameters = param
     }
-}
-
-
-public class TinyVideoContext{
-    public var cgContext:CGContext
-    public var ciContext:CIContext
-    public typealias DrawFrameCallBack = (CMTime,TinyVideoContext)->Void
-    public init(size:CGSize){
-        self.cgContext = CGContext(data: nil, width: Int(size.width), height: Int(size.height), bitsPerComponent: 8, bytesPerRow: Int(4 * size.width), space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue)!
-        self.ciContext = CIContext()
-    }
-    public func drawImage(pixel:CIImage,frame:CGRect,filter:TinyVideoFilter? = nil){
-        var img:CIImage? = pixel
-        if let f = filter{
-            img = f.filter(img: pixel)
-        }
-        if img == nil{
-            img = pixel
-        }
-        if let cgimg = self.ciContext.createCGImage(img!, from: img!.extent){
-            self.cgContext.draw(cgimg, in: frame)
-        }
-    }
-    public func exportFrame(time:CMTime,callback: DrawFrameCallBack)->CGImage?{
-        callback(time,self)
-        return self.cgContext.makeImage()
-    }
-}
-public protocol TinyVideoFilter{
-    func filter(img:CIImage) -> CIImage?
 }

@@ -35,7 +35,7 @@ kernel void add_arrays(device const float* inA,
 }
 float2 createSampleCood(uint2 gid,float w,float h,int offsetX,int offsetY,uint2 thread_grid_size){
     float2 startPix = float2(gid.x * thread_grid_size.x,gid.y * thread_grid_size.y);
-    float2 temp = float2((startPix.x + offsetX) / w ,1 - (startPix.y + offsetY) / h);
+    float2 temp = float2((startPix.x + offsetX) / w ,(startPix.y + offsetY) / h);
     return temp;
 }
 
@@ -65,49 +65,52 @@ kernel void imageScale(const texture2d<half, access::sample> from [[texture(0)]]
     }
 }
 
+float2 createSampleCood(uint2 gid,float w,float h){
+    return float2(float(gid.x) / w, float(gid.y) / h);
+}
+
 kernel void imageScaleToFit(const texture2d<half, access::sample> from [[ texture(0) ]],
                             texture2d<half, access::write> to [[texture(1)]],
-                            device const uint2* scale [[buffer(0)]],
                             uint2 gid [[thread_position_in_grid]])
 {
-    float rw = from.get_width() / to.get_width();
-    float rh = from.get_height() / to.get_height();
-    float r = 1;
-    if(rw > 1 && rh > 1){
-        r = 1 / max(rw, rh);
-    }else if(rw < 1 && rh < 1){
-        r = 1 / min(rw, rh);
-    }else{
-        if(rw > 1){
-            r = 1 / rw;
-        }else if (rh > 1){
-            r = 1 / rh;
-        }
-    }
-    uint2 grid = uint2(1,1);
-    constexpr sampler imgSample;
-    uint2 targetSize = uint2(from.get_width() * r,from.get_height() * r);
-//    for (uint i = 0 ; i < grid.x; i++){
-//        for (uint j = 0 ; j < grid.y; j++){
-//            float2 location = createSampleCood(gid, targetSize.x, targetSize.y, i, j, grid);
-//            half4 color = from.sample(imgSample, location);
-////
-//            uint x = (to.get_width() - targetSize.x) / 2 + (gid.x * grid.x + i);
-//            uint y = (to.get_height() - targetSize.y) / 2 + (gid.y * grid.y + j);
-//            uint2 start = uint2(x,y);
-//            to.write(color, uint2(gid.x * grid.x + i,gid.y * grid.y + j));
-//        }
-//    }
-//
-    float2 location = createSampleCood(gid, targetSize.x, targetSize.y, 0, 0, grid);
+    constexpr sampler imgSample(mag_filter::linear,min_filter::nearest,filter::linear,mip_filter::linear);
+    float2 originSize = float2(from.get_width(),from.get_height());
+    float2 targetSize = originSize;
+    float2 canvas = float2(to.get_width(),to.get_height());
+    
+    float rw = canvas.x / originSize.x;
+    float rh = canvas.y / originSize.y;
+    targetSize = originSize * min(rw, rh);
+    float px = (canvas.x - targetSize.x) / 2;
+    float py = (canvas.y - targetSize.y) / 2;
+    float2 location = createSampleCood(gid, targetSize.x, targetSize.y);
     half4 color = from.sample(imgSample, location);
-//
-//    uint x = (to.get_width() - targetSize.x) / 2 + (gid.x * grid.x + i);
-//    uint y = (to.get_height() - targetSize.y) / 2 + (gid.y * grid.y + j);
-//    uint2 start = uint2(x,y);
-    to.write(color, uint2(gid.x,gid.y));
+    uint2 wp = uint2(ceil(gid.x + px),ceil(gid.y + py));
+    if(gid.x <= targetSize.x && gid.y <= targetSize.y){
+        to.write(color, wp);
+    }
+}
+
+kernel void imageScaleToFill(const texture2d<half, access::sample> from [[ texture(0) ]],
+                            texture2d<half, access::write> to [[texture(1)]],
+                            uint2 gid [[thread_position_in_grid]])
+{
+    constexpr sampler imgSample(mag_filter::linear,min_filter::linear,filter::linear,mip_filter::linear);
+    float2 originSize = float2(from.get_width(),from.get_height());
+    float2 targetSize = originSize;
+    float2 canvas = float2(to.get_width(),to.get_height());
     
-    
-    
+    float rw = canvas.x / originSize.x;
+    float rh = canvas.y / originSize.y;
+    targetSize = originSize * max(rw, rh);
+    float px = (canvas.x - targetSize.x) / 2.0;
+    float py = (canvas.y - targetSize.y) / 2.0;
+    float2 location = createSampleCood(gid, targetSize.x, targetSize.y);
+    half4 color = from.sample(imgSample, location);
+    uint2 wp = uint2(ceil(gid.x + px),ceil(gid.y + py));
+    if(gid.x <= targetSize.x && gid.y <= targetSize.y){
+        to.write(color, wp);
+    }
+//    to.write(half4(1,0,0,1), wp);
 }
 

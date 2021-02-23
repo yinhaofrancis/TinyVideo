@@ -7,6 +7,8 @@
 
 import Metal
 import simd
+import MetalPerformanceShaders
+
 public class TinyMetalConfiguration{
     public var device:MTLDevice
     public var queue:MTLCommandQueue
@@ -106,21 +108,13 @@ public class TinyComputer{
                 encoder .setTextures(textures, range: 0 ..< textures.count)
             }
             if(buffers.count > 0){
-                if(pixelSize?.width != nil){
-
-                    encoder.setBuffers(buffers, offsets: (0 ..< buffers.count).map({_ in 0}), range: 1 ..< buffers.count + 1)
-                }else{
-                    encoder.setBuffers(buffers, offsets: (0 ..< buffers.count).map({_ in 0}), range: 0 ..< buffers.count)
-                }
-                
+                encoder.setBuffers(buffers, offsets: (0 ..< buffers.count).map({_ in 0}), range: 0 ..< buffers.count)
             }
             if let gsize = pixelSize{
                 let max = Int(sqrt(Double(self.device.maxThreadsPerThreadgroup.width)))
                 let x = Int(ceil(Float(gsize.width) / Float(max)))
                 let y = Int(ceil(Float(gsize.height) / Float(max)))
                 let s = MTLSize(width: x, height: y, depth: 1)
-                var grid = simd_uint2(x: UInt32(x), y: UInt32(y))
-                encoder.setBytes(&grid, length: MemoryLayout<simd_int2>.size, index: 0)
                 encoder.dispatchThreadgroups(s, threadsPerThreadgroup: MTLSize(width: max, height: max, depth: 1))
                 
             }
@@ -177,11 +171,11 @@ public class TinyComputer{
         return nil
     }
     
-    public func createTexture(width:Int,height:Int,usage:MTLTextureUsage =  [.shaderRead,.shaderWrite])->MTLTexture?{
+    public func createTexture(width:Int,height:Int,usage:MTLTextureUsage =  [.shaderRead,.shaderWrite],store:MTLStorageMode = .shared)->MTLTexture?{
         let d = MTLTextureDescriptor()
         d.pixelFormat = .bgra8Unorm_srgb
         d.width = width
-        d.storageMode = .shared
+        d.storageMode = store
         d.usage = usage
         d.height = height
         return self.device.makeTexture(descriptor: d)
@@ -190,14 +184,15 @@ public class TinyComputer{
     public func createCVPixelBuffer(img:CGImage)->CVPixelBuffer?{
         let option = [
             kCVPixelBufferCGImageCompatibilityKey:true,
-            kCVPixelBufferCGBitmapContextCompatibilityKey:true
+            kCVPixelBufferCGBitmapContextCompatibilityKey:true,
+            kCVPixelBufferMetalCompatibilityKey:true
         ]
         if let data = img.dataProvider?.data{
             
             let dp = UnsafeMutablePointer<UInt8>.allocate(capacity: CFDataGetLength(data))
             CFDataGetBytes(data, CFRange(location: 0, length: CFDataGetLength(data)), dp)
             var buffer:CVPixelBuffer?
-            CVPixelBufferCreateWithBytes(nil, img.width, img.height, kCVPixelFormatType_32ARGB, dp, img.bytesPerRow, nil, nil, option as CFDictionary, &buffer)
+            CVPixelBufferCreateWithBytes(nil, img.width, img.height, kCVPixelFormatType_32BGRA, dp, img.bytesPerRow, nil, nil, option as CFDictionary, &buffer)
         }
         
         return nil
@@ -218,6 +213,24 @@ public class TinyComputer{
     }
     public func createBuffer(size:Int)->MTLBuffer?{
         return self.device.makeBuffer(length: size, options: .storageModeShared)
+    }
+    public class func createPixelBuffer(texture:MTLTexture)->CVPixelBuffer?{
+        var px:CVPixelBuffer?
+        let r = CVPixelBufferCreate(nil, texture.width, texture.height, kCVPixelFormatType_32BGRA, nil, &px)
+        if(r == kCVReturnSuccess){
+            CVPixelBufferLockBaseAddress(px!, CVPixelBufferLockFlags(rawValue: 0))
+            if let ptr = CVPixelBufferGetBaseAddress(px!){
+                texture.getBytes(ptr, bytesPerRow: 4 * texture.width, from: MTLRegionMake2D(0, 0, texture.width, texture.height), mipmapLevel: 0)
+                CVPixelBufferUnlockBaseAddress(px!, CVPixelBufferLockFlags(rawValue: 0))
+                texture.cpuCacheMode
+                return px
+            }else{
+                
+                CVPixelBufferUnlockBaseAddress(px!, CVPixelBufferLockFlags(rawValue: 0))
+                return nil
+            }
+        }
+        return nil
     }
 }
 
@@ -298,4 +311,48 @@ public class TinyRender {
         encoder.endEncoding()
         self.configuration.commandbuffer?.present(drawable)
     }
+}
+public protocol TinyMetalFilter{
+    func filter(pixel:CVPixelBuffer)->CVPixelBuffer?
+}
+public class TinyGaussBackgroundFilter:TinyMetalFilter{
+    public func filter(pixel: CVPixelBuffer) -> CVPixelBuffer? {
+        guard let px = self.filterTexture(pixel: pixel, w: self.w, h: self.h) else { return nil }
+        return TinyComputer.createPixelBuffer(texture: px)
+    }
+    
+    public func filterTexture(pixel:CVPixelBuffer,w:Float,h:Float)->MTLTexture?{
+        autoreleasepool { () -> MTLTexture? in
+            do {
+                let ow = Float(CVPixelBufferGetWidth(pixel))
+                let oh = Float(CVPixelBufferGetHeight(pixel))
+                
+                guard let px1 = self.tiny.createTexture(img: pixel) else { return nil }
+                guard let px2 = self.tiny.createTexture(width: Int(w), height: Int(h),store: .private) else { return nil }
+                guard let px3 = self.tiny.createTexture(width: Int(w), height: Int(h)) else { return nil }
+                try self.tiny.configuration.begin()
+                try self.tiny.compute(name: "imageScaleToFill", pixelSize: MTLSize(width: Int(ow * max(h / oh , w / ow)), height: Int(oh * max(h / oh , w / ow)), depth: 1), buffers: [], textures: [px1,px2])
+                self.blur.encode(commandBuffer: self.tiny.configuration.commandbuffer!, sourceTexture: px2, destinationTexture: px3)
+                try self.tiny.compute(name: "imageScaleToFit", pixelSize: MTLSize(width: Int(ow), height: Int(oh), depth: 1), buffers: [], textures: [px1,px3])
+                try self.tiny.configuration.commit()
+                return px3
+                
+            } catch  {
+                return nil
+            }
+        }
+        
+    }
+    public init?(configuration:TinyMetalConfiguration) {
+        do {
+            self.tiny = try TinyComputer(configuration: configuration)
+            self.blur = MPSImageGaussianBlur(device: configuration.device, sigma: 20)
+        } catch  {
+            return nil
+        }
+    }
+    public var w:Float = 720
+    public var h:Float = 1280
+    public var tiny:TinyComputer
+    public var blur:MPSImageGaussianBlur
 }

@@ -20,13 +20,11 @@ class MarkViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     }
     @IBOutlet weak var img: MTKView!
     @IBOutlet weak var imgv: UIImageView!
-    let tiny = try! TinyComputer()
+    
     var asset:AVAsset?
-    var ctx:TinyVideoContext = TinyVideoContext(size: CGSize(width: 200, height: 200))
-    var track:TinyVideoTrack?
+    
     var render:TinyRender?
     
-    var blur:MPSImageGaussianBlur!
     override func viewDidLoad() {
         super.viewDidLoad()
         let a = UIImagePickerController()
@@ -37,6 +35,7 @@ class MarkViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         a.allowsEditing = false
         a.delegate = self
         self.present(a, animated: true, completion: nil)
+        self.loadvideoUrl(u: Bundle.main.url(forResource: "a", withExtension: "MOV")!)
     }
 
     func loadbuffer(buffer:MTLBuffer){
@@ -58,39 +57,37 @@ class MarkViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true, completion: nil)
         guard let u = info[.mediaURL] as? URL else { return }
-        self.asset = AVAsset(url: u)
-        self.track = try! TinyAssetVideoTrack(asset: self.asset!)
-        self.track?.ready()
-        self.call(i: 0)
+        self.loadvideoUrl(u: u)
+    }
+    func loadvideoUrl(u:URL){
+//        self.asset = AVAsset(url: u)
+//        self.track = try! TinyAssetVideoTrack(asset: self.asset!)
+//        self.track?.ready()
+//        self.call(i: 0)
     }
     func call(i:Float){
-        var img:CIImage?
-        let grid:Float = 10;
-        
-        ctx.exportFrame(time: CMTime(seconds: Double(i), preferredTimescale: .max)) { (t, c) in
-            guard let cv = self.track?.nextSampleBuffer(current: t) else { return }
-            let temp:[Float] = [grid];
-            let d = self.tiny.createBuffer(data: temp)
-            let px1 = self.tiny.createTexture(img: cv)
-//            try! self.render?.configuration.begin()
-//
-//            let r = MTLRenderPassDescriptor()
-//            r.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1)
-//
-//            try! self.render?.render(texture: px1!, renderPass: self.img.currentRenderPassDescriptor!, drawable: self.img.currentDrawable!)
-//            try! self.render?.configuration.commit()
-            
-            let w = Int(Double(CVPixelBufferGetWidth(cv)) * 0.5)
-            let h = Int(Double(CVPixelBufferGetHeight(cv)) * 0.5)
-            let px2 = self.tiny.createTexture(width: w, height: h)
-            let px3 = self.tiny.createTexture(width: w, height: h)
-            try! self.tiny.configuration.begin()
-            try! self.tiny.compute(name: "imageScaleToFit", pixelSize: MTLSize(width: w, height: h, depth: 1), buffers: [], textures: [px1!,px2!])
-//            self.blur.encode(commandBuffer: self.tiny.commandbuffer!, sourceTexture: self.img.currentDrawable!.texture, destinationTexture: px3!)
-            try! self.tiny.configuration.commit()
-            img = CIImage(mtlTexture: px2!, options: nil)
-        }
-        self.imgv.image = UIImage(ciImage: img!, scale: UIScreen.main.scale, orientation: .up)
-        
+//        var img:CIImage?
+//        let grid:Float = 10;
+//        
+//        ctx.exportFrame(time: CMTime(seconds: Double(i), preferredTimescale: .max)) { (t, c) in
+//            guard let cv = self.track?.nextSampleBuffer(current: t) else { return }
+//            
+//            let px1 = self.tiny.createTexture(img: cv)
+//            let ow = Float(CVPixelBufferGetWidth(cv));
+//            let oh = Float(CVPixelBufferGetHeight(cv));
+//            let w:Float = 720
+//            let h:Float = 1280.0
+//            let px2 = self.tiny.createTexture(width: Int(w), height: Int(h))
+//            let px3 = self.tiny.createTexture(width: Int(w), height: Int(h))
+//            try! self.tiny.configuration.begin()
+//            try! self.tiny.compute(name: "imageScaleToFill", pixelSize: MTLSize(width: Int(ow * max(h / oh , w / ow)), height: Int(oh * max(h / oh , w / ow)), depth: 1), buffers: [], textures: [px1!,px2!])
+//            self.blur.encode(commandBuffer: self.tiny.configuration.commandbuffer!, sourceTexture: px2!, destinationTexture: px3!)
+//            try! self.tiny.compute(name: "imageScaleToFit", pixelSize: MTLSize(width: Int(ow), height: Int(oh), depth: 1), buffers: [], textures: [px1!,px3!])
+//            try! self.tiny.configuration.commit()
+//            img = CIImage(mtlTexture: px3!, options: nil)
+//        }
+//        if let i = img{
+//            self.imgv.image = UIImage(ciImage: i)
+//        }
     }
 }
