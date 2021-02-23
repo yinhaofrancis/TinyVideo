@@ -68,10 +68,15 @@ kernel void imageScale(const texture2d<half, access::sample> from [[texture(0)]]
 float2 createSampleCood(uint2 gid,float w,float h){
     return float2(float(gid.x) / w, float(gid.y) / h);
 }
+enum fillType{
+    scaleToFit,
+    scaleToFill,
+    Fill
+};
 
-kernel void imageScaleToFit(const texture2d<half, access::sample> from [[ texture(0) ]],
-                            texture2d<half, access::write> to [[texture(1)]],
-                            uint2 gid [[thread_position_in_grid]])
+void imageFill(const texture2d<half, access::sample> from,
+                            texture2d<half, access::write> to ,
+               uint2 gid,fillType ft)
 {
     constexpr sampler imgSample(mag_filter::linear,min_filter::nearest,filter::linear,mip_filter::linear);
     float2 originSize = float2(from.get_width(),from.get_height());
@@ -80,29 +85,14 @@ kernel void imageScaleToFit(const texture2d<half, access::sample> from [[ textur
     
     float rw = canvas.x / originSize.x;
     float rh = canvas.y / originSize.y;
-    targetSize = originSize * min(rw, rh);
-    float px = (canvas.x - targetSize.x) / 2;
-    float py = (canvas.y - targetSize.y) / 2;
-    float2 location = createSampleCood(gid, targetSize.x, targetSize.y);
-    half4 color = from.sample(imgSample, location);
-    uint2 wp = uint2(ceil(gid.x + px),ceil(gid.y + py));
-    if(gid.x <= targetSize.x && gid.y <= targetSize.y){
-        to.write(color, wp);
+    if(ft == scaleToFit){
+        targetSize = originSize * min(rw, rh);
+    }else if(ft == scaleToFill){
+        targetSize = originSize * max(rw, rh);
+    }else if(ft == Fill){
+        targetSize = canvas;
     }
-}
-
-kernel void imageScaleToFill(const texture2d<half, access::sample> from [[ texture(0) ]],
-                            texture2d<half, access::write> to [[texture(1)]],
-                            uint2 gid [[thread_position_in_grid]])
-{
-    constexpr sampler imgSample(mag_filter::linear,min_filter::linear,filter::linear,mip_filter::linear);
-    float2 originSize = float2(from.get_width(),from.get_height());
-    float2 targetSize = originSize;
-    float2 canvas = float2(to.get_width(),to.get_height());
     
-    float rw = canvas.x / originSize.x;
-    float rh = canvas.y / originSize.y;
-    targetSize = originSize * max(rw, rh);
     float px = (canvas.x - targetSize.x) / 2.0;
     float py = (canvas.y - targetSize.y) / 2.0;
     float2 location = createSampleCood(gid, targetSize.x, targetSize.y);
@@ -111,6 +101,20 @@ kernel void imageScaleToFill(const texture2d<half, access::sample> from [[ textu
     if(gid.x <= targetSize.x && gid.y <= targetSize.y){
         to.write(color, wp);
     }
-//    to.write(half4(1,0,0,1), wp);
 }
+kernel void imageScaleToFit(const texture2d<half, access::sample> from [[ texture(0) ]],
+                            texture2d<half, access::write> to [[texture(1)]],
+                            uint2 gid [[thread_position_in_grid]])
+{
+    imageFill(from, to, gid, scaleToFit);
+}
+
+kernel void imageScaleToFill(const texture2d<half, access::sample> from [[ texture(0) ]],
+                            texture2d<half, access::write> to [[texture(1)]],
+                            uint2 gid [[thread_position_in_grid]])
+{
+    imageFill(from, to, gid, scaleToFill);
+}
+
+
 
