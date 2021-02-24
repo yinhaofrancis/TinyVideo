@@ -10,11 +10,10 @@ struct TinyVertex{
 
 
 vertex TinyVertex vertexShader(uint vertexID [[vertex_id]],
-             constant TinyVertex *vertices [[buffer(0)]],
-             constant float2 *size [[buffer(1)]]){
+             constant TinyVertex *vertices [[buffer(0)]]){
     TinyVertex r;
     
-    r.location = float4(vertices[vertexID].location.x / size[0].x * 2,vertices[vertexID].location.y / size[0].y * 2 ,0,1);
+    r.location = vertices[vertexID].location;
     r.textureVX = vertices[vertexID].textureVX;
     return r;
 }

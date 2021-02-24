@@ -27,7 +27,7 @@ public class TinyAssetVideoTrack{
     public var audioSampleRate:Double = 44100
     public var audioBitRate:Double = 64000
     public var numberOfChannel:Int = 2
-    public var quality:Double = 0.0
+//    public var quality:Double = 0.0
     private var group = DispatchGroup()
     private var queue = DispatchQueue(label: "TinyAssetVideoTrack")
     
@@ -147,7 +147,7 @@ public class TinyAssetVideoTrack{
         let compress:[String:Any] = [
             AVVideoAverageBitRateKey:self.videoBitRate,
             AVVideoExpectedSourceFrameRateKey:self.videoFrameRate,
-            AVVideoQualityKey:self.quality
+//            AVVideoQualityKey:self.quality
 //            AVVideoProfileLevelKey:AVVideoProfileLevelH264HighAutoLevel
         ]
         
@@ -158,7 +158,7 @@ public class TinyAssetVideoTrack{
         ]
         if #available(iOS 11.0, *) {
             
-            vset[AVVideoCodecKey] = AVVideoCodecType.hevc
+            vset[AVVideoCodecKey] = AVVideoCodecType.h264
         } else {
             vset[AVVideoCodecKey] = AVVideoCodecH264
             // Fallback on earlier versions

@@ -11,12 +11,19 @@ import TinyVideo
 import MobileCoreServices
 import AVFoundation
 import AVKit
+import MetalKit
 
 class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.displayView.videoLayer.device = self.render.configuration.device
     }
+    
+    @IBOutlet weak var displayView: TinyVideoView!
+    
+    var render:TinyRender = TinyRender(configuration: .defaultConfiguration)
+    
     var session:TinyVideoSession?
     var useMt:Bool = false
     func play(url:URL) {
@@ -35,7 +42,16 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         return outUrl
     }
     @IBAction func pickImage(_ sender: UIButton) {
-        self.loadlib(mt: false)
+        let a =  #imageLiteral(resourceName: "mm").cgImage!
+
+        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
+        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
+        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
+        self.render.screenSize = self.displayView.videoLayer.showSize
+        try! TinyMetalConfiguration.defaultConfiguration.begin()
+        
+        try! self.render.render(texture: text,drawable: draw)
+        try! TinyMetalConfiguration.defaultConfiguration.commit()
     }
     
     public func loadMTURL(u:URL){
@@ -49,28 +65,6 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
                 self.play(url: uu)
             }
 
-        }
-    }
-    
-    public func ciUrl(u:URL){
-        let filter = DynamicGaussBackgroundFilter()
-        let process = TinyCoreImageProcess(filter: filter)
-        do {
-            let outUrl = try self.filecreate(name: "a", ext: "mp4")
-            let input = try TinyAssetVideoProcessInput(asset: AVAsset(url: u))
-            let output = try TinyAssetVideoProcessOut(url: outUrl, type: .mp4)
-            let size = CGSize(width: 720, height: 1280)
-            output.setSourceSize(size: size)
-            filter.screenSize = size
-            self.session = TinyVideoSession(input: input, out: output, process: process)
-            self.session?.run { [weak self]i in
-                if i == nil{
-                    self?.play(url: outUrl)
-                    self?.session = nil
-                }
-            }
-        } catch  {
-            print(error)
         }
     }
     @IBAction func pickmtImage(_ sender: UIButton) {
@@ -91,49 +85,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         if let u = info[.mediaURL] as? URL{
             if self.useMt{
                 self.loadMTURL(u: u)
-            }else{
-                self.ciUrl(u: u)
             }
         }
     }
 }
-
-//public class koo: TinyFilter {
-//    public func filter(image: CIImage,time:CMTime) -> CIImage? {
-//        autoreleasepool { () -> CIImage? in
-//
-//            guard let ctxt = self.cgctx else { return nil }
-//
-//            guard let cg = cictx.createCGImage(image, from: image.extent) else { return nil }
-//
-//            ctxt.draw(image: cg, mode: .resizeFill)
-//
-//            let fs = CTFramesetterCreateWithAttributedString(self.text as CFAttributedString)
-//
-//            let text = CTFramesetterCreateFrame(fs, CFRangeMake(0, self.text.length), CGPath(rect: self.frame, transform: nil), nil)
-//
-//            CTFrameDraw(text, ctxt.context)
-//
-//            guard let img = self.cgctx?.context.makeImage() else { return nil }
-//
-//            return CIImage(cgImage: img)
-//        }
-//    }
-//    lazy var cgctx:TinyDrawContext? = {
-//        guard let rect = self.screenSize else { return nil }
-//        let context = TinyDrawContext(width: Int(rect.width), height: Int(rect.height), bytesPerRow: Int(rect.width * 4), buffer: nil)
-//        return context
-//    }()
-//
-//    public init(string:NSAttributedString,frame:CGRect) {
-//        self.text = string
-//        self.frame = frame
-//    }
-//    public var screenSize: CGSize?
-//
-//    var cictx:CIContext = CIContext()
-//
-//    public var text:NSAttributedString
-//
-//    public var frame:CGRect
-//}
