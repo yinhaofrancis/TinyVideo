@@ -60,6 +60,7 @@ class MarkViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         self.loadvideoUrl(u: u)
     }
     func loadvideoUrl(u:URL){
+        
 //        self.asset = AVAsset(url: u)
 //        self.track = try! TinyAssetVideoTrack(asset: self.asset!)
 //        self.track?.ready()

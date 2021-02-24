@@ -23,11 +23,11 @@ extension CMSampleBuffer{
 public class TinyAssetVideoTrack{
     
     public var videoFrameRate:Int = 30
-    public var videoBitRate:Double = 5 * 1024 * 1024
+    public var videoBitRate:Double = 1 * 1024 * 1024
     public var audioSampleRate:Double = 44100
     public var audioBitRate:Double = 64000
     public var numberOfChannel:Int = 2
-    
+    public var quality:Double = 0.0
     private var group = DispatchGroup()
     private var queue = DispatchQueue(label: "TinyAssetVideoTrack")
     
@@ -147,7 +147,8 @@ public class TinyAssetVideoTrack{
         let compress:[String:Any] = [
             AVVideoAverageBitRateKey:self.videoBitRate,
             AVVideoExpectedSourceFrameRateKey:self.videoFrameRate,
-            AVVideoProfileLevelKey:AVVideoProfileLevelH264HighAutoLevel
+            AVVideoQualityKey:self.quality
+//            AVVideoProfileLevelKey:AVVideoProfileLevelH264HighAutoLevel
         ]
         
         var vset:[String:Any] = [
@@ -157,12 +158,13 @@ public class TinyAssetVideoTrack{
         ]
         if #available(iOS 11.0, *) {
             
-            vset[AVVideoCodecKey] = AVVideoCodecType.h264.rawValue
+            vset[AVVideoCodecKey] = AVVideoCodecType.hevc
         } else {
             vset[AVVideoCodecKey] = AVVideoCodecH264
             // Fallback on earlier versions
         }
         guard let videoTracks = loadAsset(type: .video, setting: vset)  else { throw NSError(domain: "video config fail", code: 0, userInfo: nil)}
+        videoTracks.transform = self.videoOutput.track.preferredTransform;
         let videoTracksAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoTracks, sourcePixelBufferAttributes: nil)
         
         let dic = [

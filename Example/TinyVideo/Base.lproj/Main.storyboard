@@ -18,46 +18,7 @@
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="144" minValue="144" maxValue="4096" translatesAutoresizingMaskIntoConstraints="NO" id="3cs-NG-x7L">
-                                <rect key="frame" x="22" y="52" width="331" height="31"/>
-                                <connections>
-                                    <action selector="fbl:" destination="vXZ-lx-hvc" eventType="valueChanged" id="3st-WC-agy"/>
-                                </connections>
-                            </slider>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="144" minValue="144" maxValue="4096" translatesAutoresizingMaskIntoConstraints="NO" id="kV3-ZU-idv">
-                                <rect key="frame" x="22" y="90" width="331" height="31"/>
-                                <connections>
-                                    <action selector="fbl:" destination="vXZ-lx-hvc" eventType="valueChanged" id="02r-ld-0vd"/>
-                                </connections>
-                            </slider>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="144x144" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZMy-tA-C4V">
-                                <rect key="frame" x="154.5" y="128" width="66" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JKj-FB-Rq8">
-                                <rect key="frame" x="166.5" y="157" width="42" height="30"/>
-                                <state key="normal" title="Origin"/>
-                                <connections>
-                                    <action selector="orgin:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="wBI-gc-V7Z"/>
-                                </connections>
-                            </button>
-                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="JKj-FB-Rq8" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="0rD-aj-zad"/>
-                            <constraint firstItem="kV3-ZU-idv" firstAttribute="top" secondItem="3cs-NG-x7L" secondAttribute="bottom" constant="8" id="6di-11-Ul8"/>
-                            <constraint firstItem="kV3-ZU-idv" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="8" id="7Wu-zZ-oC5"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="3cs-NG-x7L" secondAttribute="trailing" constant="8" id="83a-4J-3fC"/>
-                            <constraint firstItem="ZMy-tA-C4V" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="Erd-bZ-c2f"/>
-                            <constraint firstItem="3cs-NG-x7L" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="8" id="I4a-nr-Hbc"/>
-                            <constraint firstItem="3cs-NG-x7L" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="8" id="Uh3-Zm-ldp"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="kV3-ZU-idv" secondAttribute="trailing" constant="8" id="acb-bV-OYt"/>
-                            <constraint firstItem="JKj-FB-Rq8" firstAttribute="top" secondItem="ZMy-tA-C4V" secondAttribute="bottom" constant="8" id="dZ5-4C-tgI"/>
-                            <constraint firstItem="ZMy-tA-C4V" firstAttribute="top" secondItem="kV3-ZU-idv" secondAttribute="bottom" constant="8" id="qr1-Wf-sdX"/>
-                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Fkj-nM-wcG">
                         <nil key="title"/>
@@ -72,11 +33,6 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <connections>
-                        <outlet property="showFBL" destination="ZMy-tA-C4V" id="wxE-zu-fdt"/>
-                        <outlet property="xSlider" destination="3cs-NG-x7L" id="inE-mX-yl2"/>
-                        <outlet property="ySlider" destination="kV3-ZU-idv" id="U8y-4O-bmt"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>

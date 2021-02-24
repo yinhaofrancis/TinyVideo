@@ -12,16 +12,13 @@ import MobileCoreServices
 import AVFoundation
 import AVKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate {
 
-    @IBOutlet weak var ySlider: UISlider!
-    @IBOutlet weak var xSlider: UISlider!
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     var session:TinyVideoSession?
-
-    @IBOutlet weak var showFBL: UILabel!
+    var useMt:Bool = false
     func play(url:URL) {
         DispatchQueue.main.async {
             let play = AVPlayerViewController()
@@ -38,14 +35,29 @@ class ViewController: UIViewController {
         return outUrl
     }
     @IBAction func pickImage(_ sender: UIButton) {
+        self.loadlib(mt: false)
+    }
+    
+    public func loadMTURL(u:URL){
+        let trace = try! TinyAssetVideoTrack(asset: AVAsset(url: u))
+        let f = TinyGaussBackgroundFilter(configuration: TinyMetalConfiguration.defaultConfiguration)
+        f?.w = 720
+        f?.h = 1280
+        trace.filter = f
+        try! trace.export(w: 720, h: 1280) { (u, s) in
+            if let uu = u {
+                self.play(url: uu)
+            }
+
+        }
+    }
+    
+    public func ciUrl(u:URL){
         let filter = DynamicGaussBackgroundFilter()
         let process = TinyCoreImageProcess(filter: filter)
-
-//        process.outputSize = CGSize(width: 720, height: 1280)
         do {
             let outUrl = try self.filecreate(name: "a", ext: "mp4")
-
-            let input = try TinyAssetVideoProcessInput(asset: self.assets)
+            let input = try TinyAssetVideoProcessInput(asset: AVAsset(url: u))
             let output = try TinyAssetVideoProcessOut(url: outUrl, type: .mp4)
             let size = CGSize(width: 720, height: 1280)
             output.setSourceSize(size: size)
@@ -61,30 +73,28 @@ class ViewController: UIViewController {
             print(error)
         }
     }
-    
-    var assets:AVAsset{
-        return AVAsset(url: Bundle.main.url(forResource: "a", withExtension: "MOV")!)
-    }
-    
     @IBAction func pickmtImage(_ sender: UIButton) {
-        
-        let trace = try! TinyAssetVideoTrack(asset: self.assets)
-        let f = TinyGaussBackgroundFilter(configuration: TinyMetalConfiguration.defaultConfiguration)
-        f?.w = 720
-        f?.h = 1280
-        trace.filter = f
-        try! trace.export(w: 720, h: 1280) { (u, s) in
-            if let uu = u {
-                self.play(url: uu)
-            }
+        self.loadlib(mt: true)
 
+    }
+    func loadlib(mt:Bool){
+        let img = UIImagePickerController()
+        self.useMt = mt
+        img.delegate = self
+        img.sourceType = .photoLibrary
+        img.mediaTypes = [kUTTypeMovie as String]
+        img.videoQuality = .typeIFrame1280x720
+        self.present(img, animated: true, completion: nil)
+    }
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+        if let u = info[.mediaURL] as? URL{
+            if self.useMt{
+                self.loadMTURL(u: u)
+            }else{
+                self.ciUrl(u: u)
+            }
         }
-    }
-    @IBAction func fbl(_ sender: Any) {
-        self.showFBL.text = "\(UInt(self.xSlider.value))x\(UInt(self.ySlider.value))"
-    }
-    @IBAction func orgin(_ sender: Any) {
-        self.play(url: Bundle.main.url(forResource: "a", withExtension: "MOV")!)
     }
 }
 

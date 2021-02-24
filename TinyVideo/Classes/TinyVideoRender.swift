@@ -64,13 +64,6 @@ public class TinyComputer{
         self.configuration = configuration
         
     }
-    
-    
-    
-    
-    
-    
-    
     #if DEBUG
     
     public func startDebug(){
@@ -222,7 +215,6 @@ public class TinyComputer{
             if let ptr = CVPixelBufferGetBaseAddress(px!){
                 texture.getBytes(ptr, bytesPerRow: 4 * texture.width, from: MTLRegionMake2D(0, 0, texture.width, texture.height), mipmapLevel: 0)
                 CVPixelBufferUnlockBaseAddress(px!, CVPixelBufferLockFlags(rawValue: 0))
-                texture.cpuCacheMode
                 return px
             }else{
                 

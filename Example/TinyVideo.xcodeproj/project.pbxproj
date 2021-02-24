@@ -14,7 +14,6 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		A9780D0225DE146400484442 /* MarkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9780D0125DE146400484442 /* MarkViewController.swift */; };
-		A9C5C78125E4AECD00D1B3C1 /* a.MOV in Resources */ = {isa = PBXBuildFile; fileRef = A9C5C78025E4AECD00D1B3C1 /* a.MOV */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,7 +33,6 @@
 		886C58040B90AE86222DA943 /* Pods-TinyVideo_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TinyVideo_Example.debug.xcconfig"; path = "Target Support Files/Pods-TinyVideo_Example/Pods-TinyVideo_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		A19F998ABF2D885E5994278F /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		A9780D0125DE146400484442 /* MarkViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkViewController.swift; sourceTree = "<group>"; };
-		A9C5C78025E4AECD00D1B3C1 /* a.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = a.MOV; sourceTree = "<group>"; };
 		B29429AB8584851EA7DA1AF0 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -78,7 +76,6 @@
 				A9780D0125DE146400484442 /* MarkViewController.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
-				A9C5C78025E4AECD00D1B3C1 /* a.MOV */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 			);
 			name = "Example for TinyVideo";
@@ -185,7 +182,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A9C5C78125E4AECD00D1B3C1 /* a.MOV in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
