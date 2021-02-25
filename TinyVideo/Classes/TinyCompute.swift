@@ -111,21 +111,24 @@ public protocol TinyMetalFilter{
 }
 public class TinyGaussBackgroundFilter:TinyMetalFilter{
     public func filter(pixel: CVPixelBuffer) -> CVPixelBuffer? {
-        guard let px = self.filterTexture(pixel: pixel, w: self.w, h: self.h) else { return nil }
+        guard let px1 = self.tiny.configuration.createTexture(img: pixel) else { return nil }
+        guard let px = self.filterTexture(pixel: px1, w: self.w, h: self.h) else { return nil }
         return TinyMetalConfiguration.createPixelBuffer(texture: px)
     }
     
-    public func filterTexture(pixel:CVPixelBuffer,w:Float,h:Float)->MTLTexture?{
+    public func filterTexture(pixel:MTLTexture,w:Float,h:Float)->MTLTexture?{
         autoreleasepool { () -> MTLTexture? in
             do {
-                let ow = Float(CVPixelBufferGetWidth(pixel))
-                let oh = Float(CVPixelBufferGetHeight(pixel))
+                let ow = Float(pixel.width)
+                let oh = Float(pixel.height)
                 
-                guard let px1 = self.tiny.configuration.createTexture(img: pixel) else { return nil }
+                let px1 = pixel
                 guard let px2 = self.tiny.configuration.createTexture(width: Int(w), height: Int(h),store: .private) else { return nil }
                 guard let px3 = self.tiny.configuration.createTexture(width: Int(w), height: Int(h)) else { return nil }
                 try self.tiny.configuration.begin()
-                try self.tiny.compute(name: "imageScaleToFill", pixelSize: MTLSize(width: Int(ow * max(h / oh , w / ow)), height: Int(oh * max(h / oh , w / ow)), depth: 1), buffers: [], textures: [px1,px2])
+                let psize =  MTLSize(width: Int(ow * max(h / oh , w / ow)), height: Int(oh * max(h / oh , w / ow)), depth: 1)
+                try self.tiny.compute(name: "imageScaleToFill", pixelSize:psize, buffers: [], textures: [px1,px2])
+                
                 self.blur.encode(commandBuffer: self.tiny.configuration.commandbuffer!, sourceTexture: px2, destinationTexture: px3)
                 try self.tiny.compute(name: "imageScaleToFit", pixelSize: MTLSize(width: Int(ow), height: Int(oh), depth: 1), buffers: [], textures: [px1,px3])
                 try self.tiny.configuration.commit()
@@ -140,7 +143,7 @@ public class TinyGaussBackgroundFilter:TinyMetalFilter{
     public init?(configuration:TinyMetalConfiguration) {
         do {
             self.tiny = try TinyComputer(configuration: configuration)
-            self.blur = MPSImageGaussianBlur(device: configuration.device, sigma: 20)
+            self.blur = MPSImageGaussianBlur(device: configuration.device, sigma: 50)
         } catch  {
             return nil
         }

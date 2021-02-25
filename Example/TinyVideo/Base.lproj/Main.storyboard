@@ -40,6 +40,13 @@
                                 <action selector="pickImage:" destination="vXZ-lx-hvc" id="jUz-FR-PkF"/>
                             </connections>
                         </barButtonItem>
+                        <slider key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="50" id="DDT-up-94P">
+                            <rect key="frame" x="75" y="5" width="235.5" height="34"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <connections>
+                                <action selector="sliderWithSender:" destination="vXZ-lx-hvc" eventType="valueChanged" id="rHY-1M-6Fi"/>
+                            </connections>
+                        </slider>
                         <barButtonItem key="rightBarButtonItem" title="Metal" id="6cf-7m-zK7">
                             <connections>
                                 <action selector="pickmtImage:" destination="vXZ-lx-hvc" id="nd7-G1-Dl9"/>

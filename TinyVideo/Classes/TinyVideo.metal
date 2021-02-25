@@ -19,9 +19,9 @@ vertex TinyVertex vertexShader(uint vertexID [[vertex_id]],
 }
 
 fragment half4 fragmentShader(TinyVertex in [[stage_in]], const texture2d<half> texture [[texture(0)]]){
-    constexpr sampler textureSampler (mag_filter::linear,
-                                      min_filter::linear);
-    return texture.sample(textureSampler, in.textureVX);
+    constexpr sampler textureSampler;
+    half4 color = texture.sample(textureSampler, in.textureVX);
+    return half4(color.xyz,1);
 }
 
 

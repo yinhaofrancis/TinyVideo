@@ -22,7 +22,9 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     
     @IBOutlet weak var displayView: TinyVideoView!
     
+    
     var render:TinyRender = TinyRender(configuration: .defaultConfiguration)
+    var comp = TinyGaussBackgroundFilter(configuration: .defaultConfiguration)
     
     var session:TinyVideoSession?
     var useMt:Bool = false
@@ -42,18 +44,21 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         return outUrl
     }
     @IBAction func pickImage(_ sender: UIButton) {
+        self.go(sigma: 50)
+    }
+    func go(sigma:Float){
         let a =  #imageLiteral(resourceName: "mm").cgImage!
 
         let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
         self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
         guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
         self.render.screenSize = self.displayView.videoLayer.showSize
+        self.render.ratio = Float(1280) / Float(720)
+        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
         try! TinyMetalConfiguration.defaultConfiguration.begin()
-        
-        try! self.render.render(texture: text,drawable: draw)
+        try! self.render.render(texture: rt,drawable: draw)
         try! TinyMetalConfiguration.defaultConfiguration.commit()
     }
-    
     public func loadMTURL(u:URL){
         let trace = try! TinyAssetVideoTrack(asset: AVAsset(url: u))
         let f = TinyGaussBackgroundFilter(configuration: TinyMetalConfiguration.defaultConfiguration)
@@ -70,6 +75,9 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     @IBAction func pickmtImage(_ sender: UIButton) {
         self.loadlib(mt: true)
 
+    }
+    @IBAction func slider(sender:UISlider){
+        self.go(sigma: sender.value)
     }
     func loadlib(mt:Bool){
         let img = UIImagePickerController()

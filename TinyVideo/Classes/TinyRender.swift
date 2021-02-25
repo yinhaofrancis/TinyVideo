@@ -10,8 +10,6 @@ import simd
 import MetalPerformanceShaders
 
 
-
-
 public class TinyRender {
     public struct vertex{
         public var location:simd_float4
@@ -27,6 +25,8 @@ public class TinyRender {
         pipelineDesc.colorAttachments[0].pixelFormat = .bgra8Unorm_srgb
         self.pipelineDescriptor = pipelineDesc
     }
+    
+    public var ratio:Float = 1
     public var screenSize:CGSize = CGSize(width: 320, height: 480)
     
     public var ortho:float4x4{
@@ -43,11 +43,14 @@ public class TinyRender {
         return b
     }()
     public var rectangle:[vertex]{
-        [
-            vertex(location: simd_float4(-0.6, 0.6, 0, 1), texture: simd_float2(0, 0)),
-            vertex(location: simd_float4(0.5, 0.5, 0, 1), texture: simd_float2(1, 0)),
-            vertex(location: simd_float4(0.5, -0.5, 0, 1), texture: simd_float2(1, 1)),
-            vertex(location: simd_float4(-0.5, -0.5, 0, 1), texture: simd_float2(0, 1))
+        let w:Float = 1
+        let h = Float(screenSize.width) / Float(screenSize.height) * ratio;
+        
+        return [
+            vertex(location: simd_float4(-w, h, 0, 1), texture: simd_float2(0, 0)),
+            vertex(location: simd_float4(w, h, 0, 1), texture: simd_float2(1, 0)),
+            vertex(location: simd_float4(w, -h, 0, 1), texture: simd_float2(1, 1)),
+            vertex(location: simd_float4(-w, -h, 0, 1), texture: simd_float2(0, 1))
         ]
     }
     public lazy var vertice:MTLBuffer? = {
@@ -66,7 +69,7 @@ public class TinyRender {
     public func render(texture:MTLTexture,drawable:CAMetalDrawable) throws{
         
         let renderPass = MTLRenderPassDescriptor()
-        renderPass.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
+        renderPass.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1)
         renderPass.colorAttachments[0].storeAction = .store
         renderPass.colorAttachments[0].loadAction = .clear
         renderPass.colorAttachments[0].texture = drawable.texture

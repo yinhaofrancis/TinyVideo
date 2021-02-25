@@ -15,8 +15,9 @@
 		6DF4EB912CF9C2A1180F49DF57FA01A5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		78868B42C0D1445893D1221D128F02CD /* TinyVideo.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5521DACEA625AD2F81E11753009A02D4 /* TinyVideo.metal */; };
 		919AC6B35F7C0C2C6126C7F34D7BDB61 /* TinyVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 196B084DC235CDBA35F37897B05862FA /* TinyVideo.swift */; };
-		92B4844A75F8C45994109B006CE24D5E /* TinyVideoRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95347DD026CA4247FC23142C23711AD9 /* TinyVideoRender.swift */; };
+		92B4844A75F8C45994109B006CE24D5E /* TinyRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95347DD026CA4247FC23142C23711AD9 /* TinyRender.swift */; };
 		A7CB56D0236DD7BE18DB445036051B23 /* TinyCompute.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D87A28F6B10A98E96D7D231E97605F /* TinyCompute.swift */; };
+		A94E71CE25E7FC850011C760 /* TinyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A94E71CD25E7FC850011C760 /* TinyView.swift */; };
 		C98A3544B38F62EC57CEAC524B1A2973 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		D799A0EB337B99D91494B7FA5566DA21 /* TinyVideo-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 864EF4B5C6CA19D545E69B676870AD3B /* TinyVideo-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F3A33E7A707B37A21EE46E04BC5181E9 /* TinyVideo-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DE245FFD0C7012B0202E538CBAD65175 /* TinyVideo-dummy.m */; };
@@ -37,22 +38,23 @@
 		196B084DC235CDBA35F37897B05862FA /* TinyVideo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TinyVideo.swift; path = TinyVideo/Classes/TinyVideo.swift; sourceTree = "<group>"; };
 		22FD2F0E14274529918ED739C8F6E689 /* Pods-TinyVideo_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-TinyVideo_Example.modulemap"; sourceTree = "<group>"; };
 		270C1ED0412769987CFE0F59DA2612F7 /* TinyConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TinyConfiguration.swift; path = TinyVideo/Classes/TinyConfiguration.swift; sourceTree = "<group>"; };
-		338316AA578C4AB58A62BF98269DE36F /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
+		338316AA578C4AB58A62BF98269DE36F /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		33BB73E1E078C4627748790FA6835469 /* Pods-TinyVideo_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-TinyVideo_Example-acknowledgements.plist"; sourceTree = "<group>"; };
 		392267EBE44522EC21788DB1FE6306B4 /* Pods-TinyVideo_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-TinyVideo_Example-umbrella.h"; sourceTree = "<group>"; };
-		4E9D3D0452CD55412CEE1DAAAF1D324C /* Pods_TinyVideo_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_TinyVideo_Example.framework; path = "Pods-TinyVideo_Example.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5521DACEA625AD2F81E11753009A02D4 /* TinyVideo.metal */ = {isa = PBXFileReference; includeInIndex = 1; name = TinyVideo.metal; path = TinyVideo/Classes/TinyVideo.metal; sourceTree = "<group>"; };
+		4E9D3D0452CD55412CEE1DAAAF1D324C /* Pods_TinyVideo_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TinyVideo_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5521DACEA625AD2F81E11753009A02D4 /* TinyVideo.metal */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.metal; name = TinyVideo.metal; path = TinyVideo/Classes/TinyVideo.metal; sourceTree = "<group>"; };
 		59D22C7397EF978834A6D779B640AFA8 /* Pods-TinyVideo_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-TinyVideo_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
 		73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		81F88A6CA20FAAB89824794D435B9014 /* TinyVideo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = TinyVideo.framework; path = TinyVideo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		81F88A6CA20FAAB89824794D435B9014 /* TinyVideo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TinyVideo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8434D4F989B178B734DDD7CBE71A8215 /* Pods-TinyVideo_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-TinyVideo_Example-dummy.m"; sourceTree = "<group>"; };
 		864EF4B5C6CA19D545E69B676870AD3B /* TinyVideo-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "TinyVideo-umbrella.h"; sourceTree = "<group>"; };
 		91B5290B8EFCBEC677550E7F70D37A16 /* TinyVideo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = TinyVideo.debug.xcconfig; sourceTree = "<group>"; };
-		9433B262E9825CFDEB66F31A25D9155B /* TinyVideo.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = TinyVideo.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9433B262E9825CFDEB66F31A25D9155B /* TinyVideo.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = TinyVideo.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		94712A2D1B8FC737D75DCD9299614199 /* TinyVideo.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = TinyVideo.modulemap; sourceTree = "<group>"; };
-		95347DD026CA4247FC23142C23711AD9 /* TinyVideoRender.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TinyVideoRender.swift; path = TinyVideo/Classes/TinyVideoRender.swift; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		95347DD026CA4247FC23142C23711AD9 /* TinyRender.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TinyRender.swift; path = TinyVideo/Classes/TinyRender.swift; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		A8E3C04DFFC4A1CC8B9C65C337431C2E /* TinyDisplay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TinyDisplay.swift; path = TinyVideo/Classes/TinyDisplay.swift; sourceTree = "<group>"; };
+		A94E71CD25E7FC850011C760 /* TinyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TinyView.swift; path = TinyVideo/Classes/TinyView.swift; sourceTree = "<group>"; };
 		AAA80D8D31F61956CAD053E0F41D4ECB /* TinyVideoTrack.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TinyVideoTrack.swift; path = TinyVideo/Classes/TinyVideoTrack.swift; sourceTree = "<group>"; };
 		B413C226C922D31CA891164C802574E1 /* TinyVideo-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "TinyVideo-prefix.pch"; sourceTree = "<group>"; };
 		B8D099D61DD184B18F588B52AE826525 /* Pods-TinyVideo_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-TinyVideo_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -61,7 +63,7 @@
 		E2331244284001051FBA0D16D9017F1B /* TinyVideo-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "TinyVideo-Info.plist"; sourceTree = "<group>"; };
 		E8D87A28F6B10A98E96D7D231E97605F /* TinyCompute.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TinyCompute.swift; path = TinyVideo/Classes/TinyCompute.swift; sourceTree = "<group>"; };
 		EB2A9C92DF241FBA7F50C3AD11B4613A /* Pods-TinyVideo_Example-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-TinyVideo_Example-Info.plist"; sourceTree = "<group>"; };
-		F79991FE6B7C0BF6333F5C33907D53AB /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		F79991FE6B7C0BF6333F5C33907D53AB /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		FC60062632E5D2B929D8C2A15F83A627 /* Pods-TinyVideo_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-TinyVideo_Example-frameworks.sh"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -125,7 +127,8 @@
 				A8E3C04DFFC4A1CC8B9C65C337431C2E /* TinyDisplay.swift */,
 				5521DACEA625AD2F81E11753009A02D4 /* TinyVideo.metal */,
 				196B084DC235CDBA35F37897B05862FA /* TinyVideo.swift */,
-				95347DD026CA4247FC23142C23711AD9 /* TinyVideoRender.swift */,
+				95347DD026CA4247FC23142C23711AD9 /* TinyRender.swift */,
+				A94E71CD25E7FC850011C760 /* TinyView.swift */,
 				AAA80D8D31F61956CAD053E0F41D4ECB /* TinyVideoTrack.swift */,
 				EED21F96DEF4E97698F5B54F572B6323 /* Pod */,
 				064D5413F540C6CBEBED10885FA9AB79 /* Support Files */,
@@ -319,7 +322,8 @@
 				F3A33E7A707B37A21EE46E04BC5181E9 /* TinyVideo-dummy.m in Sources */,
 				78868B42C0D1445893D1221D128F02CD /* TinyVideo.metal in Sources */,
 				919AC6B35F7C0C2C6126C7F34D7BDB61 /* TinyVideo.swift in Sources */,
-				92B4844A75F8C45994109B006CE24D5E /* TinyVideoRender.swift in Sources */,
+				92B4844A75F8C45994109B006CE24D5E /* TinyRender.swift in Sources */,
+				A94E71CE25E7FC850011C760 /* TinyView.swift in Sources */,
 				2B7EE56EDF660866467690B41587608E /* TinyVideoTrack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -583,8 +587,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
 				SYMROOT = "${SRCROOT}/../build";
 			};
