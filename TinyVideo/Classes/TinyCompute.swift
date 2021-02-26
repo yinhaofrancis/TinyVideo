@@ -130,7 +130,7 @@ public class TinyGaussBackgroundFilter:TinyMetalFilter{
                 try self.tiny.compute(name: "imageScaleToFill", pixelSize:psize, buffers: [], textures: [px1,px2])
                 
                 self.blur.encode(commandBuffer: self.tiny.configuration.commandbuffer!, sourceTexture: px2, destinationTexture: px3)
-                try self.tiny.compute(name: "imageScaleToFit", pixelSize: MTLSize(width: Int(ow), height: Int(oh), depth: 1), buffers: [], textures: [px1,px3])
+                try self.tiny.compute(name: "imageScaleToFit", pixelSize: psize, buffers: [], textures: [px1,px3])
                 try self.tiny.configuration.commit()
                 return px3
                 
