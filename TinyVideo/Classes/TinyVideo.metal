@@ -24,6 +24,9 @@ fragment half4 fragmentShader(TinyVertex in [[stage_in]], const texture2d<half> 
     return half4(color.xyz,1);
 }
 
+fragment half4 testShader(TinyVertex in [[stage_in]]){
+    return half4(in.textureVX.x,in.textureVX.y,0,1);
+}
 
 kernel void add_arrays(device const float* inA,
                        device const float* inB,

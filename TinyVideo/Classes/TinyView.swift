@@ -46,9 +46,9 @@ public protocol TinyLayer{
 }
 
 public struct vertex{
-    public var location: simd_float3
+    public var location: simd_float4
     public var texture: simd_float2
-    public init(location:simd_float3,texture:simd_float2){
+    public init(location:simd_float4,texture:simd_float2){
         self.location = location
         self.texture = texture
     }
@@ -64,10 +64,10 @@ extension TinyLayer{
         let h1 = self.frame.size.h / Float(bound.size.height) * 2
         
         let v = [
-            vertex(location: simd_float3(x: x1 - 1, y: y1 - 1, z: zPosion), texture: simd_float2(x: 0, y: 0)),
-            vertex(location: simd_float3(x: x1 - 1 + w1, y: y1 - 1, z: zPosion), texture: simd_float2(x: 1, y: 0)),
-            vertex(location: simd_float3(x: x1 - 1, y: y1 - 1 + h1, z: zPosion), texture: simd_float2(x: 0, y: 1)),
-            vertex(location: simd_float3(x: x1 - 1 + w1, y: y1 - 1 + h1, z: zPosion), texture: simd_float2(x: 1, y: 1)),
+            vertex(location: simd_float4(x: x1 - 1, y: y1 - 1, z: zPosion,w: 1), texture: simd_float2(x: 0, y: 0)),
+            vertex(location: simd_float4(x: x1 - 1 + w1, y: y1 - 1, z: zPosion,w: 1), texture: simd_float2(x: 1, y: 0)),
+            vertex(location: simd_float4(x: x1 - 1, y: y1 - 1 + h1, z: zPosion,w: 1), texture: simd_float2(x: 0, y: 1)),
+            vertex(location: simd_float4(x: x1 - 1 + w1, y: y1 - 1 + h1, z: zPosion,w: 1), texture: simd_float2(x: 1, y: 1)),
         ]
         return v
     }

@@ -18,6 +18,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     override func viewDidLoad() {
         super.viewDidLoad()
         self.displayView.videoLayer.device = self.render.configuration.device
+        self.ren = TinyRender(configuration: .defaultConfiguration, w: Float(self.displayView.frame.size.width), h: Float(self.displayView.frame.size.height))
     }
     
     @IBOutlet weak var displayView: TinyVideoView!
@@ -54,16 +55,17 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
 //
 //        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
 //        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
-//        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
+        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
+        
 //        self.render.screenSize = self.displayView.videoLayer.showSize
 //        self.render.ratio = Float(1280) / Float(720)
 //        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
         
-        let v = TinyView(frame: Rect(x: 10, y: 10, w: 50, h: 50), configuration: .defaultConfiguration, vertex: <#T##String#>, fragment: <#T##String#>)
+        let v = TinyView(frame: Rect(x: 10, y: 10, w: 50, h: 50), configuration: .defaultConfiguration, vertex: "vertexShader", fragment: "testShader")
         
         
         try! TinyMetalConfiguration.defaultConfiguration.begin()
-        self.ren?.render(layer: <#T##TinyLayer#>, drawable: <#T##CAMetalDrawable#>)
+        try! self.ren?.render(layer: v, drawable: draw)
 //        try! self.render.render(texture: rt,drawable: draw)
         try! TinyMetalConfiguration.defaultConfiguration.commit()
     }
