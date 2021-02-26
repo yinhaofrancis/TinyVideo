@@ -56,9 +56,6 @@ kernel void imageScale(const texture2d<half, access::sample> from [[texture(0)]]
             }
             float2 temp = createSampleCood(gid, w, h, i, j, uint2(g,g));
             half4 c = from.sample(sample, temp);
-            
-//            half4 c = half4(temp.x,temp.y,0,1);
-//            half4 c = half4(gid.x / 20.0,gid.y / 20.0 ,temp.x,1);
             to.write(c, uint2(startPix.x + i,startPix.y + j));
         }
     }

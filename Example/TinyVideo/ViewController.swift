@@ -23,7 +23,10 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     @IBOutlet weak var displayView: TinyVideoView!
     
     
-    var render:TinyRender = TinyRender(configuration: .defaultConfiguration)
+    var render:TinyTextureRender = TinyTextureRender(configuration: .defaultConfiguration)
+    
+    var ren: TinyRender?
+    
     var comp = TinyGaussBackgroundFilter(configuration: .defaultConfiguration)
     
     var session:TinyVideoSession?
@@ -47,16 +50,21 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         self.go(sigma: 50)
     }
     func go(sigma:Float){
-        let a =  #imageLiteral(resourceName: "mm").cgImage!
-
-        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
-        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
-        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
-        self.render.screenSize = self.displayView.videoLayer.showSize
-        self.render.ratio = Float(1280) / Float(720)
-        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
+//        let a =  #imageLiteral(resourceName: "mm").cgImage!
+//
+//        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
+//        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
+//        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
+//        self.render.screenSize = self.displayView.videoLayer.showSize
+//        self.render.ratio = Float(1280) / Float(720)
+//        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
+        
+        let v = TinyView(frame: Rect(x: 10, y: 10, w: 50, h: 50), configuration: .defaultConfiguration, vertex: <#T##String#>, fragment: <#T##String#>)
+        
+        
         try! TinyMetalConfiguration.defaultConfiguration.begin()
-        try! self.render.render(texture: rt,drawable: draw)
+        self.ren?.render(layer: <#T##TinyLayer#>, drawable: <#T##CAMetalDrawable#>)
+//        try! self.render.render(texture: rt,drawable: draw)
         try! TinyMetalConfiguration.defaultConfiguration.commit()
     }
     public func loadMTURL(u:URL){

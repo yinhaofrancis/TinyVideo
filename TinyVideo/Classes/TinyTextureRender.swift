@@ -10,7 +10,7 @@ import simd
 import MetalPerformanceShaders
 
 
-public class TinyRender {
+public class TinyTextureRender {
     public struct vertex{
         public var location:simd_float4
         public var texture:simd_float2
@@ -28,20 +28,7 @@ public class TinyRender {
     
     public var ratio:Float = 1
     public var screenSize:CGSize = CGSize(width: 320, height: 480)
-    
-    public var ortho:float4x4{
-        return float4x4(columns: (
-            simd_float4(1 / Float(self.screenSize.width), 0, 0, 0),
-            simd_float4(0, 1 / Float(self.screenSize.height), 0, 0),
-            simd_float4(0, 0, -1, 0),
-            simd_float4(0, 0, 0, 1)
-        ))
-    }
-    public lazy var orthoBuffer:MTLBuffer? = {
-        let b = self.configuration.device.makeBuffer(length: MemoryLayout<float4x4>.size, options: .storageModeShared)
-        b?.contents().storeBytes(of: self.ortho, toByteOffset: 0, as: float4x4.self)
-        return b
-    }()
+
     public var rectangle:[vertex]{
         let w:Float = 1
         let h = Float(screenSize.width) / Float(screenSize.height) * ratio;
@@ -78,10 +65,6 @@ public class TinyRender {
         
         encoder.setViewport(MTLViewport(originX: 0, originY: 0, width: Double(self.screenSize.width), height: Double(self.screenSize.height)
                                         , znear: -1, zfar: 1))
-        
-        encoder.setVertexBuffer(self.vertice, offset: 0, index: 0)
-        
-        
         let pipelinestate = try configuration.device.makeRenderPipelineState(descriptor: self.pipelineDescriptor)
         encoder.setRenderPipelineState(pipelinestate)
         encoder.setVertexBuffer(self.vertice, offset: 0, index: 0)
