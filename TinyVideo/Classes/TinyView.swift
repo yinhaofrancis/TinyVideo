@@ -56,12 +56,12 @@ public struct vertex{
 
 extension TinyLayer{
     public var vertice:[vertex]{
-        let bound = UIScreen.main.nativeBounds
-        let x1 = self.frame.location.x / Float(bound.size.width) * 2
-        let y1 = self.frame.location.y / Float(bound.size.height) * 2
+        let bound = UIScreen.main.bounds
+        let x1 = self.frame.location.x / Float(bound.size.width)
+        let y1 = self.frame.location.y / Float(bound.size.height)
         
-        let w1 = self.frame.size.w / Float(bound.size.width) * 2
-        let h1 = self.frame.size.h / Float(bound.size.height) * 2
+        let w1 = self.frame.size.w / Float(bound.size.width)
+        let h1 = self.frame.size.h / Float(bound.size.height)
         
         let v = [
             vertex(location: simd_float4(x: x1 - 1, y: y1 - 1, z: zPosion,w: 1), texture: simd_float2(x: 0, y: 0)),

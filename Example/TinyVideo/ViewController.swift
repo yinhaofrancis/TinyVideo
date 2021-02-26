@@ -61,7 +61,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
 //        self.render.ratio = Float(1280) / Float(720)
 //        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
         
-        let v = TinyView(frame: Rect(x: 10, y: 10, w: 50, h: 50), configuration: .defaultConfiguration, vertex: "vertexShader", fragment: "testShader")
+        let v = TinyView(frame: Rect(x: 0, y: 10 + sigma, w: 640, h: 500), configuration: .defaultConfiguration, vertex: "vertexShader", fragment: "testShader")
         
         
         try! TinyMetalConfiguration.defaultConfiguration.begin()
