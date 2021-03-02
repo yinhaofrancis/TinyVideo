@@ -26,7 +26,13 @@ public class TinyTextureRender {
         self.pipelineDescriptor = pipelineDesc
     }
     
-    public var ratio:Float = 1
+    public var ratio:Float = 1{
+        didSet{
+            if(oldValue != self.ratio){
+                self.vertice = nil;
+            }
+        }
+    }
     public var screenSize:CGSize = CGSize(width: 320, height: 480)
 
     public var rectangle:[vertex]{
@@ -40,9 +46,7 @@ public class TinyTextureRender {
             vertex(location: simd_float4(-w, -h, 0, 1), texture: simd_float2(0, 1))
         ]
     }
-    public lazy var vertice:MTLBuffer? = {
-        return self.configuration.device.makeBuffer(bytes: rectangle, length: MemoryLayout<vertex>.stride * rectangle.count, options: .storageModeShared)
-    }()
+    public var vertice:MTLBuffer?
     
     
     public lazy var indexVertice:MTLBuffer? = {
@@ -54,9 +58,11 @@ public class TinyTextureRender {
         ]
     }
     public func render(texture:MTLTexture,drawable:CAMetalDrawable) throws{
-        
         let renderPass = MTLRenderPassDescriptor()
-        renderPass.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1)
+        if(self.vertice == nil){
+            self.vertice = self.configuration.device.makeBuffer(bytes: rectangle, length: MemoryLayout<vertex>.stride * rectangle.count, options: .storageModeShared)
+        }
+        renderPass.colorAttachments[0].clearColor = MTLClearColor(red: 1, green: 1, blue: 1, alpha: 1)
         renderPass.colorAttachments[0].storeAction = .store
         renderPass.colorAttachments[0].loadAction = .clear
         renderPass.colorAttachments[0].texture = drawable.texture

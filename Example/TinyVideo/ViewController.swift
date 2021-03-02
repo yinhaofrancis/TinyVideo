@@ -17,19 +17,13 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.displayView.videoLayer.device = self.render.configuration.device
-        self.ren = TinyRender(configuration: .defaultConfiguration, w: Float(self.displayView.frame.size.width), h: Float(self.displayView.frame.size.height))
     }
     
     @IBOutlet weak var displayView: TinyVideoView!
     
-    
-    var render:TinyTextureRender = TinyTextureRender(configuration: .defaultConfiguration)
-    
-    var ren: TinyRender?
-    
-    var comp = TinyGaussBackgroundFilter(configuration: .defaultConfiguration)
-    
+
+    var player:TinyVideoPlayer?
+    var comp = TinyTransformFilter(configuration: .defaultConfiguration)
     var session:TinyVideoSession?
     var useMt:Bool = false
     func play(url:URL) {
@@ -40,6 +34,14 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
             self.present(play, animated: true, completion: nil)
         }
     }
+    func playmt(url:URL) {
+        self.player = TinyVideoPlayer(url: url)
+        self.displayView.videoLayer.player = self.player
+        
+//        self.displayView.videoLayer.videoFilter = self.comp         
+        self.player?.play()
+        self.displayView.videoLayer.clean()
+    }
     func filecreate(name:String,ext:String) throws->URL{
         let outUrl = try FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent(name).appendingPathExtension(ext)
         if FileManager.default.fileExists(atPath: outUrl.path){
@@ -48,26 +50,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         return outUrl
     }
     @IBAction func pickImage(_ sender: UIButton) {
-        self.go(sigma: 50)
-    }
-    func go(sigma:Float){
-//        let a =  #imageLiteral(resourceName: "mm").cgImage!
-//
-//        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
-//        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
-        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
-        
-//        self.render.screenSize = self.displayView.videoLayer.showSize
-//        self.render.ratio = Float(1280) / Float(720)
-//        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
-        
-        let v = TinyView(frame: Rect(x: 0, y: 10 + sigma, w: 640, h: 500), configuration: .defaultConfiguration, vertex: "vertexShader", fragment: "testShader")
-        
-        
-        try! TinyMetalConfiguration.defaultConfiguration.begin()
-        try! self.ren?.render(layer: v, drawable: draw)
-//        try! self.render.render(texture: rt,drawable: draw)
-        try! TinyMetalConfiguration.defaultConfiguration.commit()
+        self.loadlib(mt: false)
     }
     public func loadMTURL(u:URL){
         let trace = try! TinyAssetVideoTrack(asset: AVAsset(url: u))
@@ -82,12 +65,34 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
 
         }
     }
+    
     @IBAction func pickmtImage(_ sender: UIButton) {
         self.loadlib(mt: true)
-
     }
-    @IBAction func slider(sender:UISlider){
-        self.go(sigma: sender.value)
+
+    func process(url:URL){
+        let filter = DynamicGaussBackgroundFilter()
+        filter.saveCache = false
+        let process = TinyCoreImageProcess(filter: filter)
+        
+        do {
+            let outUrl = try self.filecreate(name: "a", ext: "mp4")
+            let input = try TinyAssetVideoProcessInput(asset: AVAsset(url: url))
+            let output = try TinyAssetVideoProcessOut(url: outUrl, type: .mp4)
+            output.setSourceSize(size: CGSize(width: UIScreen.main.bounds.size.width * UIScreen.main.scale, height: UIScreen.main.bounds.size.height * UIScreen.main.scale))
+            filter.screenSize = UIScreen.main.bounds.size
+            self.session = TinyVideoSession(input: input, out: output, process: process)
+            self.session?.run { [weak self]i in
+                if i == nil{
+                    self?.play(url: outUrl)
+                    self?.session = nil
+                }
+            }
+        } catch  {
+            print(error)
+        }
+        
+        
     }
     func loadlib(mt:Bool){
         let img = UIImagePickerController()
@@ -103,6 +108,8 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         if let u = info[.mediaURL] as? URL{
             if self.useMt{
                 self.loadMTURL(u: u)
+            }else{
+                self.playmt(url: u)
             }
         }
     }

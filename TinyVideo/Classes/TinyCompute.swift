@@ -108,6 +108,7 @@ public class TinyComputer{
 }
 public protocol TinyMetalFilter{
     func filter(pixel:CVPixelBuffer)->CVPixelBuffer?
+    func filterTexture(pixel:MTLTexture,w:Float,h:Float)->MTLTexture?
 }
 public class TinyGaussBackgroundFilter:TinyMetalFilter{
     public func filter(pixel: CVPixelBuffer) -> CVPixelBuffer? {
@@ -152,4 +153,54 @@ public class TinyGaussBackgroundFilter:TinyMetalFilter{
     public var h:Float = 1280
     public var tiny:TinyComputer
     public var blur:MPSImageGaussianBlur
+}
+public class TinyTransformFilter:TinyMetalFilter{
+    
+    public var transform:simd_float3x3 = simd_float3x3([
+                                            simd_float3(1, 0, 0),
+                                            simd_float3(0, 1, 0),
+                                            simd_float3(0, 0, 1)
+    ]){
+        didSet{
+            self.buffer = self.tiny.configuration.createBuffer(data: self.transform)
+        }
+    }
+    public var buffer:MTLBuffer?
+    public func filter(pixel: CVPixelBuffer) -> CVPixelBuffer? {
+        return nil
+    }
+    
+    public func filterTexture(pixel: MTLTexture, w: Float, h: Float) -> MTLTexture? {
+        autoreleasepool { () -> MTLTexture? in
+            do {
+                let px1 = pixel
+                guard let px3 = self.tiny.configuration.createTexture(width: Int(w), height: Int(h)) else { return nil }
+                try self.tiny.configuration.begin()
+                if(self.buffer == nil){
+                    self.buffer = self.tiny.configuration.createBuffer(data: self.transform)
+                }
+                if let buffer = self.buffer{
+                    try self.tiny.compute(name: "imageTransform", pixelSize: MTLSize(width: Int(w), height: Int(h), depth: 1), buffers: [buffer], textures: [px1,px3])
+                }
+                try self.tiny.configuration.commit()
+                return px3
+                
+            } catch  {
+                return nil
+            }
+        }
+    }
+    
+    public init?(configuration:TinyMetalConfiguration) {
+        do {
+            self.tiny = try TinyComputer(configuration: configuration)
+            self.transform = simd_float3x3([
+                                            simd_float3(0, -1,0),
+                                            simd_float3(1, 0, 0),
+                                            simd_float3(0, 1280, 1)])
+        } catch  {
+            return nil
+        }
+    }
+    public var tiny:TinyComputer
 }
