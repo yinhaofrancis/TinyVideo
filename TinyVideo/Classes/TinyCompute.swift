@@ -144,7 +144,7 @@ public class TinyGaussBackgroundFilter:TinyMetalFilter{
     public init?(configuration:TinyMetalConfiguration) {
         do {
             self.tiny = try TinyComputer(configuration: configuration)
-            self.blur = MPSImageGaussianBlur(device: configuration.device, sigma: 50)
+            self.blur = MPSImageGaussianBlur(device: configuration.device, sigma: 30)
         } catch  {
             return nil
         }
