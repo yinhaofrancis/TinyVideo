@@ -48,6 +48,14 @@
                                 </switch>
                             </barButtonItem>
                         </leftBarButtonItems>
+                        <button key="titleView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="1am-DX-qG6">
+                            <rect key="frame" x="154" y="7" width="67" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="testPhoto"/>
+                            <connections>
+                                <action selector="test" destination="vXZ-lx-hvc" eventType="touchUpInside" id="LX2-CP-xfP"/>
+                            </connections>
+                        </button>
                         <rightBarButtonItems>
                             <barButtonItem title="process" id="6cf-7m-zK7">
                                 <connections>
