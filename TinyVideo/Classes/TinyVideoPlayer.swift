@@ -11,10 +11,24 @@ import AVFoundation
 public class TinyVideoPlayer:AVPlayer{
     
     public var output = AVPlayerItemVideoOutput(pixelBufferAttributes: [kCVPixelBufferPixelFormatTypeKey as String:kCVPixelFormatType_32BGRA])
-    
+    public var currentPresentTransform:CGAffineTransform = .identity
     public override func play() {
-        super.play()
-        self.currentItem?.add(self.output)
+        if let ass = self.currentItem?.asset{
+            ass.loadValuesAsynchronously(forKeys: ["tracks"], completionHandler: {
+                if ass.statusOfValue(forKey: "tracks", error: nil) == .loaded{
+                    if let tracks = ass.tracks(withMediaType: .video).first{
+                        tracks.loadValuesAsynchronously(forKeys: ["preferredTransform"]) {
+                            if(tracks.statusOfValue(forKey: "preferredTransform", error: nil) == .loaded){
+                                self.currentPresentTransform = tracks.preferredTransform
+                                super.play()
+                                self.currentItem?.add(self.output)
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        
     }
     
     public func copyPixelbuffer()->CVPixelBuffer?{

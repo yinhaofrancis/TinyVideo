@@ -45,9 +45,9 @@ public class TinyMetalConfiguration{
     }
     
     
-    public static var defaultConfiguration:TinyMetalConfiguration = {
+    public static var defaultConfiguration:TinyMetalConfiguration{
         return try! TinyMetalConfiguration()
-    }()
+    }
     
     private var textureCache:CVMetalTextureCache?
     

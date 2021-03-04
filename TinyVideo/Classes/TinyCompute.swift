@@ -156,7 +156,7 @@ public class TinyGaussBackgroundFilter:TinyMetalFilter{
 }
 public class TinyTransformFilter:TinyMetalFilter{
     
-    public var transform:simd_float3x3 = simd_float3x3([
+    private var transform:simd_float3x3 = simd_float3x3([
                                             simd_float3(1, 0, 0),
                                             simd_float3(0, 1, 0),
                                             simd_float3(0, 0, 1)
@@ -174,6 +174,10 @@ public class TinyTransformFilter:TinyMetalFilter{
         autoreleasepool { () -> MTLTexture? in
             do {
                 let px1 = pixel
+                self.transform = simd_float3x3([
+                                                simd_float3(0, -1,0),
+                                                simd_float3(1, 0, 0),
+                                                simd_float3(0, w, 1)])
                 guard let px3 = self.tiny.configuration.createTexture(width: Int(w), height: Int(h)) else { return nil }
                 try self.tiny.configuration.begin()
                 if(self.buffer == nil){
@@ -194,10 +198,6 @@ public class TinyTransformFilter:TinyMetalFilter{
     public init?(configuration:TinyMetalConfiguration) {
         do {
             self.tiny = try TinyComputer(configuration: configuration)
-            self.transform = simd_float3x3([
-                                            simd_float3(0, -1,0),
-                                            simd_float3(1, 0, 0),
-                                            simd_float3(0, 1280, 1)])
         } catch  {
             return nil
         }

@@ -123,7 +123,7 @@ kernel void imageTransform(const texture2d<half, access::sample> from [[ texture
     
     float3 fg = float3(gid.x,gid.y,1);
     float3 gv = transform[0] * fg;
-    float2 sp = float2(gv.x  / from.get_width(),gv.y / from.get_height());
+    float2 sp = float2(gv.x  / to.get_height(),gv.y / to.get_width());
     half4 color = from.sample(imgSample, sp);
     to.write(color, gid);
 }

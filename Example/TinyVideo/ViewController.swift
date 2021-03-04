@@ -22,6 +22,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     @IBOutlet weak var displayView: TinyVideoView!
     
 
+    var render = TinyTextureRender(configuration: .defaultConfiguration)
     var player:TinyVideoPlayer?
     var comp = TinyTransformFilter(configuration: .defaultConfiguration)
     var session:TinyVideoSession?
@@ -37,8 +38,6 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     func playmt(url:URL) {
         self.player = TinyVideoPlayer(url: url)
         self.displayView.videoLayer.player = self.player
-        
-//        self.displayView.videoLayer.videoFilter = self.comp         
         self.player?.play()
         self.displayView.videoLayer.clean()
     }
@@ -60,7 +59,9 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         trace.filter = f
         try! trace.export(w: 720, h: 1280) { (u, s) in
             if let uu = u {
-                self.play(url: uu)
+                DispatchQueue.main.async {
+                    self.playmt(url: uu)
+                }
             }
 
         }
@@ -113,4 +114,18 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
             }
         }
     }
+    func test(){
+        let a =  #imageLiteral(resourceName: "mm").cgImage!
+
+        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
+        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
+        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
+        self.render.screenSize = self.displayView.videoLayer.showSize
+        self.render.ratio = Float(1280) / Float(720)
+        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
+        try! TinyMetalConfiguration.defaultConfiguration.begin()
+        try! self.render.render(texture: rt,drawable: draw)
+        try! TinyMetalConfiguration.defaultConfiguration.commit()
+    }
+    
 }

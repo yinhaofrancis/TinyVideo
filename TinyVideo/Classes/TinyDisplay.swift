@@ -31,13 +31,13 @@ public class TinyVideoLayer:CAMetalLayer{
         }
     }
     @objc func renderVideo(){
-        if let pl = self.player{
-            if let px = self.getCurrentPixelBuffer(),pl.status == .readyToPlay{
+        if let pl = self.player,let item = pl.currentItem{
+            if let px = self.getCurrentPixelBuffer(),item.status == .readyToPlay{
                 guard let texture = self.render.configuration.createTexture(img: px) else { return }
                 self.render.screenSize = self.showSize;
-                if let filter = self.videoFilter{
+                if let p = self.player , p.currentPresentTransform != .identity{
 
-                    guard let outTexture = filter.filterTexture(pixel: texture, w: Float(self.render.screenSize.width), h: Float(self.render.screenSize.height)) else { return }
+                    guard let outTexture = self.videoFilter.filterTexture(pixel: texture, w: Float(self.render.screenSize.width), h: Float(self.render.screenSize.height)) else { return }
                     
                     guard let draw = self.nextDrawable() else { return  }
                     do {
@@ -55,14 +55,10 @@ public class TinyVideoLayer:CAMetalLayer{
                         self.render.ratio = Float(texture.height) / Float(texture.width)
                         try self.render.render(texture: texture, drawable: draw)
                         try self.render.configuration.commit()
-
                     } catch {
                         return
                     }
                 }
-                
-                
-                
             }
         }else{
             self.timer?.invalidate()
@@ -79,12 +75,26 @@ public class TinyVideoLayer:CAMetalLayer{
     }
     public func clean(){
         self.render.vertice = nil
-//        self.render.screenSize = 
     }
-    public var videoFilter:TinyMetalFilter?
-    private var render = TinyTextureRender(configuration: .defaultConfiguration)
+    lazy private var videoFilter:TinyMetalFilter = {
+        return TinyTransformFilter(configuration: render.configuration)!
+    }()
+    private var render:TinyTextureRender
     private var timer:CADisplayLink?
     
+    public init(configuration:TinyMetalConfiguration = .defaultConfiguration) {
+        self.render = TinyTextureRender(configuration: configuration)
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        self.render = TinyTextureRender(configuration: .defaultConfiguration)
+        super.init(coder: coder)
+    }
+    public override init() {
+        self.render = TinyTextureRender(configuration: .defaultConfiguration)
+        super.init()
+    }
     
     
 }
