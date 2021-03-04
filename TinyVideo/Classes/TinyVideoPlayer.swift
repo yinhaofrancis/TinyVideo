@@ -9,7 +9,7 @@ import UIKit
 import AVFoundation
 
 public class TinyVideoPlayer:AVPlayer{
-    
+    private var lastPixelBuffer:CVPixelBuffer?
     public var output = AVPlayerItemVideoOutput(pixelBufferAttributes: [kCVPixelBufferPixelFormatTypeKey as String:kCVPixelFormatType_32BGRA])
     public var currentPresentTransform:CGAffineTransform = .identity
     public override func play() {
@@ -33,7 +33,9 @@ public class TinyVideoPlayer:AVPlayer{
     
     public func copyPixelbuffer()->CVPixelBuffer?{
         if let time = self.currentItem?.currentTime(), self.output.hasNewPixelBuffer(forItemTime: time){
-            return self.output.copyPixelBuffer(forItemTime: time, itemTimeForDisplay: nil)
+            var ptime = CMTime.zero
+            self.lastPixelBuffer = self.output.copyPixelBuffer(forItemTime: time, itemTimeForDisplay: &ptime);
+            return self.lastPixelBuffer
         }
         return nil
     }

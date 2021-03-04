@@ -17,7 +17,7 @@ public class TinyVideoLayer:CAMetalLayer{
         return CGSize(width: self.frame.size.width * UIScreen.main.scale , height: self.frame.size.height * UIScreen.main.scale)
     }
     var lastTimestamp:CFTimeInterval = 0;
-    var lastPixelBuffer:CVPixelBuffer?
+
     public var player:TinyVideoPlayer?{
         didSet{
             if self.player != nil{
@@ -37,7 +37,7 @@ public class TinyVideoLayer:CAMetalLayer{
                 self.render.screenSize = self.showSize;
                 if let p = self.player , p.currentPresentTransform != .identity{
 
-                    guard let outTexture = self.videoFilter.filterTexture(pixel: texture, w: Float(self.render.screenSize.width), h: Float(self.render.screenSize.height)) else { return }
+                    guard let outTexture = self.videoFilter.filterTexture(pixel: texture, w: Float(texture.height), h: Float(texture.width)) else { return }
                     
                     guard let draw = self.nextDrawable() else { return  }
                     do {
@@ -63,15 +63,11 @@ public class TinyVideoLayer:CAMetalLayer{
         }else{
             self.timer?.invalidate()
             self.timer = nil
+            
         }
     }
     func getCurrentPixelBuffer()->CVPixelBuffer?{
-        if let px = self.player?.copyPixelbuffer(){
-            self.lastPixelBuffer = px
-            return px
-        }else{
-            return self.lastPixelBuffer
-        }
+        return self.player?.copyPixelbuffer()
     }
     public func clean(){
         self.render.vertice = nil
