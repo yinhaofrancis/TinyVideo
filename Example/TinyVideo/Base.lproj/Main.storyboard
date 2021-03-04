@@ -17,11 +17,11 @@
                         <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mFp-Jx-3VN" customClass="TinyVideoView" customModule="TinyVideo">
-                                <rect key="frame" x="0.0" y="44" width="375" height="623"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                         </subviews>
@@ -35,19 +35,37 @@
                     </view>
                     <navigationItem key="navigationItem" id="Fkj-nM-wcG">
                         <nil key="title"/>
-                        <barButtonItem key="leftBarButtonItem" title="render" id="BbS-T7-eST">
-                            <connections>
-                                <action selector="pickImage:" destination="vXZ-lx-hvc" id="jUz-FR-PkF"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Metal" id="6cf-7m-zK7">
-                            <connections>
-                                <action selector="pickmtImage:" destination="vXZ-lx-hvc" id="nd7-G1-Dl9"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem title="player" id="BbS-T7-eST">
+                                <connections>
+                                    <action selector="pickImage:" destination="vXZ-lx-hvc" id="jUz-FR-PkF"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem style="plain" id="o0p-CE-9ux">
+                                <switch key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" id="pbt-QM-UQu">
+                                    <rect key="frame" x="73.5" y="6.5" width="51" height="31"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                </switch>
+                            </barButtonItem>
+                        </leftBarButtonItems>
+                        <rightBarButtonItems>
+                            <barButtonItem title="process" id="6cf-7m-zK7">
+                                <connections>
+                                    <action selector="pickmtImage:" destination="vXZ-lx-hvc" id="nd7-G1-Dl9"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem style="plain" id="sX0-wc-a4d">
+                                <switch key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" id="iNg-fb-E7B">
+                                    <rect key="frame" x="239.5" y="6.5" width="51" height="31"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                </switch>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="displayView" destination="mFp-Jx-3VN" id="dFe-qj-Fzm"/>
+                        <outlet property="selectGpu" destination="iNg-fb-E7B" id="Dfz-Om-Gfx"/>
+                        <outlet property="selectTinyPlay" destination="pbt-QM-UQu" id="xVJ-P1-nUV"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
@@ -59,7 +77,7 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="vzc-l3-jd5" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Hnb-mw-Fzl">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Hnb-mw-Fzl">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
