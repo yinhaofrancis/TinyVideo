@@ -19,7 +19,7 @@ vertex TinyVertex vertexShader(uint vertexID [[vertex_id]],
 }
 
 fragment half4 fragmentShader(TinyVertex in [[stage_in]], const texture2d<half> texture [[texture(0)]]){
-    constexpr sampler textureSampler;
+    constexpr sampler textureSampler(mag_filter::linear,min_filter::linear,filter::linear,mip_filter::linear);
     half4 color = texture.sample(textureSampler, in.textureVX);
     return half4(color.xyz,1);
 }
@@ -77,7 +77,7 @@ void imageFill(const texture2d<half, access::sample> from,
                             texture2d<half, access::write> to ,
                uint2 gid,fillType ft)
 {
-    constexpr sampler imgSample(mag_filter::linear,min_filter::nearest,filter::linear,mip_filter::linear);
+    constexpr sampler imgSample(mag_filter::linear,min_filter::linear,filter::linear,mip_filter::linear);
     float2 originSize = float2(from.get_width(),from.get_height());
     float2 targetSize = originSize;
     float2 canvas = float2(to.get_width(),to.get_height());
@@ -119,7 +119,7 @@ kernel void imageTransform(const texture2d<half, access::sample> from [[ texture
                             device float3x3 *transform [[buffer(0)]],
                             uint2 gid [[thread_position_in_grid]])
 {
-    constexpr sampler imgSample(mag_filter::linear,min_filter::nearest,filter::linear,mip_filter::linear);
+    constexpr sampler imgSample(mag_filter::linear,min_filter::linear,filter::linear,mip_filter::linear);;
     
     float3 fg = float3(gid.x,gid.y,1);
     float3 gv = transform[0] * fg;

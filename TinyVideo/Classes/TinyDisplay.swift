@@ -81,15 +81,18 @@ public class TinyVideoLayer:CAMetalLayer{
     public init(configuration:TinyMetalConfiguration = .defaultConfiguration) {
         self.render = TinyTextureRender(configuration: configuration)
         super.init()
+        self.contentsScale = UIScreen.main.scale;
     }
     
     required init?(coder: NSCoder) {
         self.render = TinyTextureRender(configuration: .defaultConfiguration)
         super.init(coder: coder)
+        self.contentsScale = UIScreen.main.scale;
     }
     public override init() {
         self.render = TinyTextureRender(configuration: .defaultConfiguration)
         super.init()
+        self.contentsScale = UIScreen.main.scale;
     }
     
     
