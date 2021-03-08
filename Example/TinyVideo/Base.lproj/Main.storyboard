@@ -35,45 +35,27 @@
                     </view>
                     <navigationItem key="navigationItem" id="Fkj-nM-wcG">
                         <nil key="title"/>
-                        <leftBarButtonItems>
-                            <barButtonItem title="player" id="BbS-T7-eST">
-                                <connections>
-                                    <action selector="pickImage:" destination="vXZ-lx-hvc" id="jUz-FR-PkF"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem style="plain" id="o0p-CE-9ux">
-                                <switch key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" id="pbt-QM-UQu">
-                                    <rect key="frame" x="73.5" y="6.5" width="51" height="31"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                </switch>
-                            </barButtonItem>
-                        </leftBarButtonItems>
+                        <barButtonItem key="leftBarButtonItem" title="player" id="BbS-T7-eST">
+                            <connections>
+                                <action selector="pickImage:" destination="vXZ-lx-hvc" id="jUz-FR-PkF"/>
+                            </connections>
+                        </barButtonItem>
                         <button key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="1am-DX-qG6">
                             <rect key="frame" x="154" y="7" width="67" height="30"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="playUrl"/>
+                            <state key="normal" title="config"/>
                             <connections>
                                 <segue destination="UHS-yt-vAq" kind="show" id="xvV-zp-yNm"/>
                             </connections>
                         </button>
-                        <rightBarButtonItems>
-                            <barButtonItem title="process" id="6cf-7m-zK7">
-                                <connections>
-                                    <action selector="pickmtImage:" destination="vXZ-lx-hvc" id="nd7-G1-Dl9"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem style="plain" id="sX0-wc-a4d">
-                                <switch key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" id="iNg-fb-E7B">
-                                    <rect key="frame" x="239.5" y="6.5" width="51" height="31"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                </switch>
-                            </barButtonItem>
-                        </rightBarButtonItems>
+                        <barButtonItem key="rightBarButtonItem" title="process" id="6cf-7m-zK7">
+                            <connections>
+                                <action selector="pickmtImage:" destination="vXZ-lx-hvc" id="nd7-G1-Dl9"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="displayView" destination="mFp-Jx-3VN" id="dFe-qj-Fzm"/>
-                        <outlet property="selectGpu" destination="iNg-fb-E7B" id="Dfz-Om-Gfx"/>
-                        <outlet property="selectTinyPlay" destination="pbt-QM-UQu" id="xVJ-P1-nUV"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
@@ -92,36 +74,70 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="gR9-PU-zSA">
-                                <rect key="frame" x="16" y="8" width="343" height="34"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="uMg-Pn-CSv">
+                                <rect key="frame" x="16" y="8" width="343" height="31"/>
                                 <subviews>
-                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" horizontalCompressionResistancePriority="744" verticalCompressionResistancePriority="740" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="poq-eZ-8c6">
-                                        <rect key="frame" x="0.0" y="0.0" width="305" height="34"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits"/>
-                                    </textField>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Pc-Es-btY">
-                                        <rect key="frame" x="313" y="0.0" width="30" height="34"/>
-                                        <state key="normal" title="play"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="使用 Tiny Player" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P1q-Qx-2td">
+                                        <rect key="frame" x="0.0" y="0.0" width="284" height="31"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YyV-93-RHc">
+                                        <rect key="frame" x="294" y="0.0" width="51" height="31"/>
                                         <connections>
-                                            <segue destination="QQr-Bp-tbj" kind="unwind" unwindAction="playWithSegue:" id="Ekw-Kd-02b"/>
+                                            <action selector="selectTinyPlayAction:" destination="UHS-yt-vAq" eventType="valueChanged" id="Req-Ql-10u"/>
                                         </connections>
-                                    </button>
+                                    </switch>
                                 </subviews>
                             </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="Md9-fM-7YF">
+                                <rect key="frame" x="16" y="47" width="343" height="31"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="使用 Metal 处理" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Igm-XW-0Av">
+                                        <rect key="frame" x="0.0" y="0.0" width="284" height="31"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vpq-4t-4bX">
+                                        <rect key="frame" x="294" y="0.0" width="51" height="31"/>
+                                        <connections>
+                                            <action selector="selectGpuAction:" destination="UHS-yt-vAq" eventType="valueChanged" id="VBT-c6-DvC"/>
+                                        </connections>
+                                    </switch>
+                                </subviews>
+                            </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o3r-Or-v2F">
+                                <rect key="frame" x="172" y="142" width="31" height="64"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="64" id="YJG-4i-P03"/>
+                                </constraints>
+                                <state key="normal" title="配置"/>
+                                <connections>
+                                    <segue destination="QQr-Bp-tbj" kind="unwind" unwindAction="playWithSegue:" id="908-dN-jcG"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstAttribute="trailingMargin" secondItem="gR9-PU-zSA" secondAttribute="trailing" id="WaI-wV-eGy"/>
-                            <constraint firstItem="gR9-PU-zSA" firstAttribute="leading" secondItem="eTP-A3-bCz" secondAttribute="leadingMargin" id="e2w-Zp-uUV"/>
-                            <constraint firstItem="gR9-PU-zSA" firstAttribute="top" secondItem="WUa-Pp-D7I" secondAttribute="bottom" constant="8" id="sQu-IJ-dBf"/>
+                            <constraint firstItem="uMg-Pn-CSv" firstAttribute="top" secondItem="WUa-Pp-D7I" secondAttribute="bottom" constant="8" symbolic="YES" id="7vO-HY-PGo"/>
+                            <constraint firstItem="Md9-fM-7YF" firstAttribute="leading" secondItem="eTP-A3-bCz" secondAttribute="leadingMargin" id="DPy-Zk-8wE"/>
+                            <constraint firstItem="Md9-fM-7YF" firstAttribute="top" secondItem="uMg-Pn-CSv" secondAttribute="bottom" constant="8" id="LHe-Rj-3G2"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="uMg-Pn-CSv" secondAttribute="trailing" id="Ldb-47-hh8"/>
+                            <constraint firstItem="o3r-Or-v2F" firstAttribute="top" secondItem="Md9-fM-7YF" secondAttribute="bottom" constant="64" id="Smb-Cv-9VB"/>
+                            <constraint firstItem="uMg-Pn-CSv" firstAttribute="leading" secondItem="eTP-A3-bCz" secondAttribute="leadingMargin" id="YCq-yI-fJy"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Md9-fM-7YF" secondAttribute="trailing" id="cVh-yC-8y2"/>
+                            <constraint firstItem="o3r-Or-v2F" firstAttribute="centerX" secondItem="eTP-A3-bCz" secondAttribute="centerX" id="iK4-Up-Ztc"/>
                         </constraints>
                     </view>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" id="5sS-Ug-o7U">
                         <nil key="title"/>
                     </navigationItem>
                     <connections>
-                        <outlet property="url" destination="poq-eZ-8c6" id="qxB-9J-6Z7"/>
+                        <outlet property="selectGpu" destination="vpq-4t-4bX" id="z9A-Fy-0gB"/>
+                        <outlet property="selectTinyPlay" destination="YyV-93-RHc" id="ecu-gd-5su"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tiI-13-ecm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

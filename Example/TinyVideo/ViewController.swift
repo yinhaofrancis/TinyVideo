@@ -19,9 +19,6 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         super.viewDidLoad()
     }
     
-    @IBOutlet weak var selectGpu:UISwitch!
-    @IBOutlet weak var selectTinyPlay:UISwitch!
-    
     @IBOutlet weak var displayView: TinyVideoView!
     
 
@@ -32,19 +29,20 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     }()
     var session:TinyVideoSession?
     var noProcess:Bool = false
-    public func play(useSystem:Bool,url:URL) {
-        if useSystem{
+    public func play(useTiny:Bool,url:URL) {
+        if useTiny{
+            
+            self.player = TinyVideoPlayer(url: url)
+            self.displayView.videoLayer.player = self.player
+            self.player?.play()
+            self.displayView.videoLayer.clean()
+        }else{
             DispatchQueue.main.async {
                 let play = AVPlayerViewController()
                 play.player = AVPlayer(url: url)
                 play.player?.play()
                 self.present(play, animated: true, completion: nil)
             }
-        }else{
-            self.player = TinyVideoPlayer(url: url)
-            self.displayView.videoLayer.player = self.player
-            self.player?.play()
-            self.displayView.videoLayer.clean()
         }
         
     }
@@ -82,7 +80,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         try! trace.export(w: 720, h: 1280) { (u, s) in
             if let uu = u {
                 DispatchQueue.main.async {
-                    self.play(useSystem: !self.selectTinyPlay.isOn, url: uu)
+                    self.play(useTiny: self.model.selectTinyPlay, url: uu)
                 }
             }
 
@@ -97,14 +95,14 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
             let outUrl = try self.filecreate(name: "a", ext: "mp4")
             let input = try TinyAssetVideoProcessInput(asset: AVAsset(url: url))
             let output = try TinyAssetVideoProcessOut(url: outUrl, type: .mp4)
-            output.setSourceSize(size: CGSize(width: UIScreen.main.bounds.size.width * UIScreen.main.scale, height: UIScreen.main.bounds.size.height * UIScreen.main.scale))
-            filter.screenSize = UIScreen.main.bounds.size
+            output.setSourceSize(size: CGSize(width: 720, height: 1280))
+            filter.screenSize = CGSize(width: 720, height: 1280)
             self.session = TinyVideoSession(input: input, out: output, process: process)
             self.session?.run { [weak self]i in
                 if i == nil{
                     if let ws = self{
                         DispatchQueue.main.async {
-                            ws.play(useSystem: !ws.selectTinyPlay.isOn, url: outUrl)
+                            ws.play(useTiny: ws.model.selectTinyPlay, url: outUrl)
                             ws.session = nil
                         }
                     }
@@ -128,9 +126,9 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         picker.dismiss(animated: true, completion: nil)
         if let u = info[.mediaURL] as? URL{
             if self.noProcess{
-                self.play(useSystem: !self.selectTinyPlay.isOn, url: u)
+                self.play(useTiny: self.model.selectTinyPlay, url: u)
             }else{
-                self.process(useGpu: self.selectGpu.isOn, u: u)
+                self.process(useGpu: self.model.selectGpu, u: u)
             }
             
         }
@@ -150,8 +148,9 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     }
     @IBAction func play(segue:UIStoryboardSegue){
         let v = segue.source as! SelectViewController
-        if let text = v.url.text, let c = URL(string: text){
-            self.play(useSystem: false, url: c)
+        self.model = v.model
+        if  let c = self.model.url{
+            self.play(useTiny: false, url: c)
         }
         
     }
@@ -159,9 +158,36 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         self.test()
     }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let v = segue.destination as! SelectViewController
+        v.model = self.model
+    }
+    
+    
+    var model:ConfigModel = ConfigModel(selectGpu: true, selectTinyPlay: true, url: nil)
 }
 
+struct ConfigModel {
+    var selectGpu:Bool
+    var selectTinyPlay:Bool
+    var url:URL?
+}
 
 class SelectViewController: UIViewController{
-    @IBOutlet weak var url:UITextField!
+
+    @IBOutlet weak var selectGpu:UISwitch!
+    @IBOutlet weak var selectTinyPlay:UISwitch!
+    
+    var model:ConfigModel = ConfigModel(selectGpu: true, selectTinyPlay: true, url: nil)
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.selectGpu.isOn = self.model.selectGpu
+        self.selectTinyPlay.isOn = self.model.selectTinyPlay
+    }
+    @IBAction func selectGpuAction(_ sender: UISwitch) {
+        self.model.selectGpu = sender.isOn
+    }
+    @IBAction func selectTinyPlayAction(_ sender: UISwitch) {
+        self.model.selectTinyPlay = sender.isOn
+    }
 }
