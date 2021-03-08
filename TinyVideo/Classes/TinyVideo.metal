@@ -26,40 +26,10 @@ fragment half4 fragmentShader(TinyVertex in [[stage_in]],
     half4 color = texture.sample(textureSampler, in.textureVX);
     return half4(color.xyz,1);
 }
-kernel void add_arrays(device const float* inA,
-                       device const float* inB,
-                       device float* result,
-                       uint index [[thread_position_in_grid]])
-{
-    result[index] = inA[index] + inB[index];
-}
 float2 createSampleCood(uint2 gid,float w,float h,int offsetX,int offsetY,uint2 thread_grid_size){
     float2 startPix = float2(gid.x * thread_grid_size.x,gid.y * thread_grid_size.y);
     float2 temp = float2((startPix.x + offsetX) / w ,(startPix.y + offsetY) / h);
     return temp;
-}
-
-kernel void imageScale(const texture2d<half, access::sample> from [[texture(0)]],
-                       texture2d<half, access::write> to [[texture (1)]],
-                       device const float* scale [[buffer(0)]],
-                       uint2 gid [[thread_position_in_grid]])
-{
-    constexpr sampler sample;
-    float g = scale[0];
-    float2 startPix = float2(gid.x * g,gid.y * g);
-    float w = to.get_width();
-    
-    float h = to.get_height();
-    for (int i = 0; i < g; i++){
-        for (int j = 0; j < g; j++){
-            if(startPix.x + i >= to.get_width() || startPix.y + j >= to.get_height()){
-                break;
-            }
-            float2 temp = createSampleCood(gid, w, h, i, j, uint2(g,g));
-            half4 c = from.sample(sample, temp);
-            to.write(c, uint2(startPix.x + i,startPix.y + j));
-        }
-    }
 }
 
 float2 createSampleCood(uint2 gid,float w,float h){
