@@ -27,7 +27,9 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
 
     var render = TinyTextureRender(configuration: .defaultConfiguration)
     var player:TinyVideoPlayer?
-    var comp = TinyTransformFilter(configuration: .defaultConfiguration)
+    lazy var comp:TinyTransformFilter = {
+        return TinyTransformFilter(configuration: self.render.configuration)!
+    }()
     var session:TinyVideoSession?
     var noProcess:Bool = false
     func play(useSystem:Bool,url:URL) {
@@ -135,14 +137,14 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     }
     @IBAction func test(){
         let a =  #imageLiteral(resourceName: "mm").cgImage!
-
         let text = try! MTKTextureLoader(device: self.render.configuration.device).newTexture(cgImage: a, options: nil)
         self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
         guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
         self.render.screenSize = self.displayView.videoLayer.showSize
         self.render.ratio = Float(1280) / Float(720)
-        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
+        guard let rt = comp.filterTexture(pixel: text, w: 720, h: 1280) else { return }
         try! self.render.configuration.begin()
+       
         try! self.render.render(texture: rt,drawable: draw)
         try! self.render.configuration.commit()
     }

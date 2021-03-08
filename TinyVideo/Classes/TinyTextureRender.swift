@@ -23,7 +23,10 @@ public class TinyTextureRender {
         pipelineDesc.vertexFunction = configuration.shaderLibrary.makeFunction(name: "vertexShader")
         pipelineDesc.fragmentFunction = configuration.shaderLibrary.makeFunction(name: "fragmentShader")
         pipelineDesc.colorAttachments[0].pixelFormat = .bgra8Unorm_srgb
+        
         self.pipelineDescriptor = pipelineDesc
+        
+        pipelineDesc.vertexDescriptor = self.vertexDescriptor;
     }
     
     public var ratio:Float = 1{
@@ -52,6 +55,26 @@ public class TinyTextureRender {
     public lazy var indexVertice:MTLBuffer? = {
         return self.configuration.device.makeBuffer(bytes: rectangleIndex, length: rectangleIndex.count * MemoryLayout<UInt32>.size, options: .storageModeShared)
     }()
+    public lazy var samplerState:MTLSamplerState? = {
+        let sample = MTLSamplerDescriptor()
+        sample.mipFilter = .linear
+        sample.magFilter = .linear
+        sample.minFilter = .linear
+        return self.configuration.device.makeSamplerState(descriptor: sample)
+    }()
+    public lazy var vertexDescriptor:MTLVertexDescriptor = {
+        let vd = MTLVertexDescriptor()
+        vd.attributes[0].format = .float4
+        vd.attributes[0].offset = 0;
+        vd.attributes[0].bufferIndex = 0;
+        vd.attributes[1].format = .float2
+        vd.attributes[1].offset = MemoryLayout<simd_float4>.stride
+        vd.attributes[1].bufferIndex = 0
+        vd.layouts[0].stride = MemoryLayout<vertex>.stride
+        vd.layouts[0].stepRate = 1;
+        vd.layouts[0].stepFunction = .perVertex
+        return vd
+    }()
     public var rectangleIndex:[UInt32]{
         [
             0,3,1,2
@@ -75,6 +98,7 @@ public class TinyTextureRender {
         encoder.setRenderPipelineState(pipelinestate)
         encoder.setVertexBuffer(self.vertice, offset: 0, index: 0)
         encoder.setFragmentTexture(texture, index: 0)
+        encoder.setFragmentSamplerState(self.samplerState, index: 0)
         if let indexb = self.indexVertice{
             encoder.drawIndexedPrimitives(type: .triangleStrip, indexCount: rectangleIndex.count, indexType: .uint32, indexBuffer: indexb, indexBufferOffset: 0)
         }

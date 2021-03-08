@@ -7,27 +7,25 @@ struct TinyVertex{
     float4 location [[position]];
     float2 textureVX;
 };
+struct TinyVertexIn{
+    float4 location [[attribute(0)]];
+    float2 textureVX [[attribute(1)]];
+};
 
-
-vertex TinyVertex vertexShader(uint vertexID [[vertex_id]],
-             constant TinyVertex *vertices [[buffer(0)]]){
+vertex TinyVertex vertexShader(TinyVertexIn vertices [[stage_in]]){
     TinyVertex r;
-    
-    r.location = vertices[vertexID].location;
-    r.textureVX = vertices[vertexID].textureVX;
+    r.location = vertices.location;
+    r.textureVX = vertices.textureVX;
     return r;
 }
 
-fragment half4 fragmentShader(TinyVertex in [[stage_in]], const texture2d<half> texture [[texture(0)]]){
-    constexpr sampler textureSampler(mag_filter::linear,min_filter::linear,filter::linear,mip_filter::linear);
+fragment half4 fragmentShader(TinyVertex in [[stage_in]],
+                              const texture2d<half> texture [[texture(0)]],
+                              const sampler textureSampler [[sampler(0)]]){
+//    constexpr sampler textureSampler(mag_filter::linear,min_filter::linear,filter::linear,mip_filter::linear);
     half4 color = texture.sample(textureSampler, in.textureVX);
     return half4(color.xyz,1);
 }
-
-fragment half4 testShader(TinyVertex in [[stage_in]]){
-    return half4(in.textureVX.x,in.textureVX.y,0,1);
-}
-
 kernel void add_arrays(device const float* inA,
                        device const float* inB,
                        device float* result,
