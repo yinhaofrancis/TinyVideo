@@ -88,7 +88,7 @@ kernel void imageTransform(const texture2d<half, access::sample> from [[ texture
                             uint2 gid [[thread_position_in_grid]])
 {
     constexpr sampler imgSample(mag_filter::linear,min_filter::linear,filter::linear,mip_filter::linear);;
-    
+
     float3 fg = float3(gid.x,gid.y,1);
     float3 gv = transform[0] * fg;
     float2 sp = float2(gv.x  / to.get_height(),gv.y / to.get_width());

@@ -48,12 +48,12 @@
                                 </switch>
                             </barButtonItem>
                         </leftBarButtonItems>
-                        <button key="titleView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="1am-DX-qG6">
+                        <button key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="1am-DX-qG6">
                             <rect key="frame" x="154" y="7" width="67" height="30"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="testPhoto"/>
+                            <state key="normal" title="playUrl"/>
                             <connections>
-                                <action selector="test" destination="vXZ-lx-hvc" eventType="touchUpInside" id="LX2-CP-xfP"/>
+                                <segue destination="UHS-yt-vAq" kind="show" id="xvV-zp-yNm"/>
                             </connections>
                         </button>
                         <rightBarButtonItems>
@@ -79,6 +79,55 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="976.79999999999995" y="91.304347826086968"/>
+        </scene>
+        <!--Select View Controller-->
+        <scene sceneID="axH-eC-jsU">
+            <objects>
+                <viewController id="UHS-yt-vAq" customClass="SelectViewController" customModule="TinyVideo_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="WUa-Pp-D7I"/>
+                        <viewControllerLayoutGuide type="bottom" id="aXn-4S-pG1"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="eTP-A3-bCz">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="gR9-PU-zSA">
+                                <rect key="frame" x="16" y="8" width="343" height="34"/>
+                                <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" horizontalCompressionResistancePriority="744" verticalCompressionResistancePriority="740" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="poq-eZ-8c6">
+                                        <rect key="frame" x="0.0" y="0.0" width="305" height="34"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Pc-Es-btY">
+                                        <rect key="frame" x="313" y="0.0" width="30" height="34"/>
+                                        <state key="normal" title="play"/>
+                                        <connections>
+                                            <segue destination="QQr-Bp-tbj" kind="unwind" unwindAction="playWithSegue:" id="Ekw-Kd-02b"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="gR9-PU-zSA" secondAttribute="trailing" id="WaI-wV-eGy"/>
+                            <constraint firstItem="gR9-PU-zSA" firstAttribute="leading" secondItem="eTP-A3-bCz" secondAttribute="leadingMargin" id="e2w-Zp-uUV"/>
+                            <constraint firstItem="gR9-PU-zSA" firstAttribute="top" secondItem="WUa-Pp-D7I" secondAttribute="bottom" constant="8" id="sQu-IJ-dBf"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="5sS-Ug-o7U">
+                        <nil key="title"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="url" destination="poq-eZ-8c6" id="qxB-9J-6Z7"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="tiI-13-ecm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="QQr-Bp-tbj" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="1861.5999999999999" y="90.404797601199405"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="bBN-77-jCD">

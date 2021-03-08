@@ -107,34 +107,3 @@ public struct TinyView:TinyLayer{
     }
 }
 
-public class TinyRender{
-    public var configuration:TinyMetalConfiguration
-    public var w:Float
-    public var h:Float
-    public init(configuration:TinyMetalConfiguration,w:Float,h:Float) {
-        self.configuration = configuration
-        self.w = w
-        self.h = h
-    }
-    public func render(layer:TinyLayer,drawable:CAMetalDrawable) throws{
-        let renderPass = MTLRenderPassDescriptor()
-        renderPass.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1)
-        renderPass.colorAttachments[0].storeAction = .store
-        renderPass.colorAttachments[0].loadAction = .clear
-        renderPass.colorAttachments[0].texture = drawable.texture
-        guard let encoder = self.configuration.commandbuffer?.makeRenderCommandEncoder(descriptor: renderPass) else { throw NSError(domain: "start encoder fail", code: 0, userInfo: nil)}
-        encoder.setViewport(MTLViewport(originX: 0, originY: 0, width: Double(w), height: Double(h)
-                                        , znear: -1000, zfar: 1000))
-        
-        encoder.setVertexBuffer(layer.verticsBuffer(device: self.configuration.device), offset: 0, index: 0)
-        let pipelinestate = try configuration.device.makeRenderPipelineState(descriptor: layer.pipelineDescriptor)
-        encoder.setRenderPipelineState(pipelinestate)
-        
-        if let indexb = layer.indexVertice(device: self.configuration.device){
-            encoder.drawIndexedPrimitives(type: .triangleStrip, indexCount: layer.rectangleIndex.count, indexType: .uint32, indexBuffer: indexb, indexBufferOffset: 0)
-        }
-        encoder.endEncoding()
-        self.configuration.commandbuffer?.present(drawable)
-        
-    }
-}

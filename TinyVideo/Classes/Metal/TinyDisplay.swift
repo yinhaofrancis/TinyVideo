@@ -9,14 +9,11 @@ import Metal
 import AVFoundation
 
 public class TinyVideoLayer:CAMetalLayer{
-    
-    public var renderSize:CGSize{
-        return CGSize(width: self.frame.size.width * UIScreen.main.scale , height: self.frame.size.height * UIScreen.main.scale)
-    }
     public var showSize:CGSize{
         return CGSize(width: self.frame.size.width * UIScreen.main.scale , height: self.frame.size.height * UIScreen.main.scale)
     }
-    var lastTimestamp:CFTimeInterval = 0;
+
+    public var renderScale:Float = 1
 
     public var player:TinyVideoPlayer?{
         didSet{
@@ -34,30 +31,16 @@ public class TinyVideoLayer:CAMetalLayer{
         if let pl = self.player,let item = pl.currentItem{
             if let px = self.getCurrentPixelBuffer(),item.status == .readyToPlay{
                 guard let texture = self.render.configuration.createTexture(img: px) else { return }
+                guard let displayTexture = self.transformTexture(texture: texture) else { return }
                 self.render.screenSize = self.showSize;
-                if let p = self.player , p.currentPresentTransform != .identity{
-
-                    guard let outTexture = self.videoFilter.filterTexture(pixel: texture, w: Float(texture.height), h: Float(texture.width)) else { return }
-                    
-                    guard let draw = self.nextDrawable() else { return  }
-                    do {
-                        try self.render.configuration.begin()
-                        self.render.ratio = Float(outTexture.height) / Float(outTexture.width)
-                        try self.render.render(texture: outTexture, drawable: draw)
-                        try self.render.configuration.commit()
-                    } catch {
-                        return
-                    }
-                }else{
-                    guard let draw = self.nextDrawable() else { return  }
-                    do {
-                        try self.render.configuration.begin()
-                        self.render.ratio = Float(texture.height) / Float(texture.width)
-                        try self.render.render(texture: texture, drawable: draw)
-                        try self.render.configuration.commit()
-                    } catch {
-                        return
-                    }
+                guard let draw = self.nextDrawable() else { return  }
+                do {
+                    try self.render.configuration.begin()
+                    self.render.ratio = Float(displayTexture.height) / Float(displayTexture.width)
+                    try self.render.render(texture: displayTexture, drawable: draw)
+                    try self.render.configuration.commit()
+                } catch {
+                    return
                 }
             }
         }else{
@@ -66,15 +49,29 @@ public class TinyVideoLayer:CAMetalLayer{
             
         }
     }
+    func transformTexture(texture:MTLTexture)->MTLTexture?{
+        var result:MTLTexture?
+        result = texture
+        if let p = self.player , p.currentPresentTransform != .identity{
+            guard let outTexture = self.videoTransformFilter.filterTexture(pixel: texture, w: Float(texture.height), h: Float(texture.width)) else { return nil }
+            result = outTexture
+        }
+        if let filter = self.videoFilter{
+            result = filter.filterTexture(pixel: result!, w: Float(self.showSize.width)  * self.renderScale, h: Float(self.showSize.height) * self.renderScale)
+        }
+        return result
+    }
     func getCurrentPixelBuffer()->CVPixelBuffer?{
         return self.player?.copyPixelbuffer()
     }
     public func clean(){
         self.render.vertice = nil
     }
-    lazy private var videoFilter:TinyMetalFilter = {
-        return TinyTransformFilter(configuration: render.configuration)!
+    lazy private var videoTransformFilter:TinyMetalFilter = {
+        return TinyTransformFilter(configuration: .defaultConfiguration)!
     }()
+    
+    public var videoFilter:TinyMetalFilter?
     private var render:TinyTextureRender
     private var timer:CADisplayLink?
     

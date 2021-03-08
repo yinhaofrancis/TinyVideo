@@ -147,8 +147,6 @@ public class TinyAssetVideoTrack{
         let compress:[String:Any] = [
             AVVideoAverageBitRateKey:self.videoBitRate,
             AVVideoExpectedSourceFrameRateKey:self.videoFrameRate,
-//            AVVideoQualityKey:self.quality
-//            AVVideoProfileLevelKey:AVVideoProfileLevelH264HighAutoLevel
         ]
         
         var vset:[String:Any] = [

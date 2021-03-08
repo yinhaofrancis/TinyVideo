@@ -32,7 +32,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     }()
     var session:TinyVideoSession?
     var noProcess:Bool = false
-    func play(useSystem:Bool,url:URL) {
+    public func play(useSystem:Bool,url:URL) {
         if useSystem{
             DispatchQueue.main.async {
                 let play = AVPlayerViewController()
@@ -135,10 +135,10 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
             
         }
     }
-    @IBAction func test(){
+    func test(){
         let a =  #imageLiteral(resourceName: "mm").cgImage!
         let text = try! MTKTextureLoader(device: self.render.configuration.device).newTexture(cgImage: a, options: nil)
-        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
+        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.showSize
         guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
         self.render.screenSize = self.displayView.videoLayer.showSize
         self.render.ratio = Float(1280) / Float(720)
@@ -148,5 +148,20 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         try! self.render.render(texture: rt,drawable: draw)
         try! self.render.configuration.commit()
     }
+    @IBAction func play(segue:UIStoryboardSegue){
+        let v = segue.source as! SelectViewController
+        if let text = v.url.text, let c = URL(string: text){
+            self.play(useSystem: false, url: c)
+        }
+        
+    }
     
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        self.test()
+    }
+}
+
+
+class SelectViewController: UIViewController{
+    @IBOutlet weak var url:UITextField!
 }

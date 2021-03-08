@@ -14,14 +14,17 @@ public class TinyVideoPlayer:AVPlayer{
     public var currentPresentTransform:CGAffineTransform = .identity
     public override func play() {
         if let ass = self.currentItem?.asset{
-            ass.loadValuesAsynchronously(forKeys: ["tracks"], completionHandler: {
+            ass.loadValuesAsynchronously(forKeys: ["tracks","playable"], completionHandler: {
                 if ass.statusOfValue(forKey: "tracks", error: nil) == .loaded{
                     if let tracks = ass.tracks(withMediaType: .video).first{
                         tracks.loadValuesAsynchronously(forKeys: ["preferredTransform"]) {
                             if(tracks.statusOfValue(forKey: "preferredTransform", error: nil) == .loaded){
                                 self.currentPresentTransform = tracks.preferredTransform
-                                super.play()
                                 self.currentItem?.add(self.output)
+                                super.play()
+                                if(tracks.statusOfValue(forKey: "playable", error: nil) == .loaded && ass.isPlayable){
+                                    super.play()
+                                }
                             }
                         }
                     }
