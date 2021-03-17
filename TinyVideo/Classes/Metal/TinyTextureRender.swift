@@ -8,7 +8,7 @@
 import Metal
 import simd
 import MetalPerformanceShaders
-
+import MetalKit
 
 public class TinyTextureRender {
     public struct vertex{
@@ -80,6 +80,14 @@ public class TinyTextureRender {
             0,3,1,2
         ]
     }
+    
+    
+    public func render(image:CGImage,drawable:CAMetalDrawable) throws{
+        
+        let text = try MTKTextureLoader.init(device: self.configuration.device).newTexture(cgImage: image, options: nil)
+        try self.render(texture: text, drawable: drawable)
+    }
+    
     public func render(texture:MTLTexture,drawable:CAMetalDrawable) throws{
         let renderPass = MTLRenderPassDescriptor()
         if(self.vertice == nil){

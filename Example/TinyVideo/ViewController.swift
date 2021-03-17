@@ -74,10 +74,10 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     func processGPU(u:URL){
         let trace = try! TinyAssetVideoTrack(asset: AVAsset(url: u))
         let f = TinyGaussBackgroundFilter(configuration: TinyMetalConfiguration.defaultConfiguration)
-        f?.w = 720
-        f?.h = 1280
+        f?.w = 640
+        f?.h = 1080
         trace.filter = f
-        try! trace.export(w: 720, h: 1280) { (u, s) in
+        try! trace.export(w:160, h: 270) { (u, s) in
             if let uu = u {
                 DispatchQueue.main.async {
                     self.play(useTiny: self.model.selectTinyPlay, url: uu)
@@ -95,8 +95,8 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
             let outUrl = try self.filecreate(name: "a", ext: "mp4")
             let input = try TinyAssetVideoProcessInput(asset: AVAsset(url: url))
             let output = try TinyAssetVideoProcessOut(url: outUrl, type: .mp4)
-            output.setSourceSize(size: CGSize(width: 720, height: 1280))
-            filter.screenSize = CGSize(width: 720, height: 1280)
+            output.setSourceSize(size: CGSize(width: 144, height: 360))
+            filter.screenSize = CGSize(width: 144, height: 360)
             self.session = TinyVideoSession(input: input, out: output, process: process)
             self.session?.run { [weak self]i in
                 if i == nil{
@@ -133,19 +133,18 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
             
         }
     }
-    func test(){
-        let a =  #imageLiteral(resourceName: "mm").cgImage!
-        let text = try! MTKTextureLoader(device: self.render.configuration.device).newTexture(cgImage: a, options: nil)
+    func render(image:CGImage){
+
         self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.showSize
         guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
         self.render.screenSize = self.displayView.videoLayer.showSize
-        self.render.ratio = Float(1280) / Float(720)
-        guard let rt = comp.filterTexture(pixel: text, w: 720, h: 1280) else { return }
+        self.render.ratio = Float(480) / Float(320)
         try! self.render.configuration.begin()
        
-        try! self.render.render(texture: rt,drawable: draw)
+        try! self.render.render(image:image, drawable: draw)
         try! self.render.configuration.commit()
     }
+
     @IBAction func play(segue:UIStoryboardSegue){
         let v = segue.source as! SelectViewController
         self.model = v.model
@@ -156,7 +155,23 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     }
     
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
-        self.test()
+        let img = TinyDrawImage(width: 320 * 3, height: 480 * 3).draw { (ctx) in
+            ctx.setFillColor(UIColor.red.cgColor)
+            ctx.fill(CGRect(x: 10, y: 10, width: 200 * 3, height: 200 * 3))
+            let m = NSMutableAttributedString(string: "f0123456789af十大", attributes: [.foregroundColor:UIColor.white,.font:UIFont.systemFont(ofSize: 20 * 3)])
+            let img = #imageLiteral(resourceName: "mm").cgImage
+            let imgr = TinyTextImage(image: img!, font: CTFontCreateWithName("system" as CFString, 128, nil))
+            imgr.contentMode = .scaleToAcceptFill
+            let a = NSAttributedString.runDelegate(run: imgr)
+            let n = NSMutableAttributedString(string: "f9876543210af", attributes: [.foregroundColor:UIColor.yellow,.font:UIFont.systemFont(ofSize: 20 * 3)])
+            m.append(a)
+            m.append(n)
+            let frame = TinyTextFrame(string:m, range: CFRange(location: 0, length: m.length), path: CGPath(rect: CGRect(x: 10, y: 10, width: 200 * 3, height: 200 * 3), transform: nil))
+           
+            frame.draw(ctx: ctx)
+        }
+        self.render(image: img!)
+
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let v = segue.destination as! SelectViewController
