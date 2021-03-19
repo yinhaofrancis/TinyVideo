@@ -17,28 +17,36 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.displayView.videoLayer.device = self.render.configuration.device
-        self.ren = TinyRender(configuration: .defaultConfiguration, w: Float(self.displayView.frame.size.width), h: Float(self.displayView.frame.size.height))
     }
     
     @IBOutlet weak var displayView: TinyVideoView!
     
-    
-    var render:TinyTextureRender = TinyTextureRender(configuration: .defaultConfiguration)
-    
-    var ren: TinyRender?
-    
-    var comp = TinyGaussBackgroundFilter(configuration: .defaultConfiguration)
-    
+
+    var render = TinyTextureRender(configuration: .defaultConfiguration)
+    var player:TinyVideoPlayer?
+    lazy var comp:TinyTransformFilter = {
+        return TinyTransformFilter(configuration: self.render.configuration)!
+    }()
     var session:TinyVideoSession?
-    var useMt:Bool = false
-    func play(url:URL) {
-        DispatchQueue.main.async {
-            let play = AVPlayerViewController()
-            play.player = AVPlayer(url: url)
-            play.player?.play()
-            self.present(play, animated: true, completion: nil)
+    var noProcess:Bool = false
+    public func play(useTiny:Bool,url:URL) {
+        if useTiny{
+            if((self.player) != nil){
+                self.player?.pause()
+            }
+            self.player = TinyVideoPlayer(url: url)
+            self.displayView.videoLayer.player = self.player
+            self.player?.play()
+            self.displayView.videoLayer.clean()
+        }else{
+            DispatchQueue.main.async {
+                let play = AVPlayerViewController()
+                play.player = AVPlayer(url: url)
+                play.player?.play()
+                self.present(play, animated: true, completion: nil)
+            }
         }
+        
     }
     func filecreate(name:String,ext:String) throws->URL{
         let outUrl = try FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent(name).appendingPathExtension(ext)
@@ -47,19 +55,22 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         }
         return outUrl
     }
-    @IBAction func pickImage(_ sender: UIButton) {
-        self.go(sigma: 50)
+    @IBAction func pickImage() {
+        self.loadlib(noProcess: false)
+    }
+    @IBAction func pickpImage() {
+        self.loadlib(noProcess: true)
     }
     func go(sigma:Float){
         let a =  #imageLiteral(resourceName: "mm").cgImage!
 
         let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
-        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
+        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.showSize
         guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
         
         self.render.screenSize = self.displayView.videoLayer.showSize
         self.render.ratio = Float(1280) / Float(720)
-        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
+        guard let rt = comp.filterTexture(pixel: text, w: 720, h: 1280) else { return }
         
         
         
@@ -68,29 +79,52 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         try! self.render.render(texture: rt,drawable: draw)
         try! TinyMetalConfiguration.defaultConfiguration.commit()
     }
-    public func loadMTURL(u:URL){
+    
+    func processGPU(u:URL){
         let trace = try! TinyAssetVideoTrack(asset: AVAsset(url: u))
         let f = TinyGaussBackgroundFilter(configuration: TinyMetalConfiguration.defaultConfiguration)
-        f?.w = 720
-        f?.h = 1280
+        f?.w = 480
+        f?.h = 720
         trace.filter = f
-        try! trace.export(w: 720, h: 1280) { (u, s) in
+        try! trace.export(w:480, h: 720) { (u, s) in
             if let uu = u {
-                self.play(url: uu)
+                DispatchQueue.main.async {
+                    self.play(useTiny: self.model.selectTinyPlay, url: uu)
+                }
             }
 
         }
     }
-    @IBAction func pickmtImage(_ sender: UIButton) {
-        self.loadlib(mt: true)
-
+    func processCPU(url:URL){
+        let filter = DynamicGaussBackgroundFilter()
+        filter.saveCache = false
+        let process = TinyCoreImageProcess(filter: filter)
+        
+        do {
+            let outUrl = try self.filecreate(name: "a", ext: "mp4")
+            let input = try TinyAssetVideoProcessInput(asset: AVAsset(url: url))
+            let output = try TinyAssetVideoProcessOut(url: outUrl, type: .mp4)
+            output.setSourceSize(size: CGSize(width: 144, height: 360))
+            filter.screenSize = CGSize(width: 144, height: 360)
+            self.session = TinyVideoSession(input: input, out: output, process: process)
+            self.session?.run { [weak self]i in
+                if i == nil{
+                    if let ws = self{
+                        DispatchQueue.main.async {
+                            ws.play(useTiny: ws.model.selectTinyPlay, url: outUrl)
+                            ws.session = nil
+                        }
+                    }
+                    
+                }
+            }
+        } catch  {
+            print(error)
+        }
     }
-    @IBAction func slider(sender:UISlider){
-        self.go(sigma: sender.value)
-    }
-    func loadlib(mt:Bool){
+    func loadlib(noProcess:Bool){
         let img = UIImagePickerController()
-        self.useMt = mt
+        self.noProcess = noProcess
         img.delegate = self
         img.sourceType = .photoLibrary
         img.mediaTypes = [kUTTypeMovie as String]
@@ -100,9 +134,85 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true, completion: nil)
         if let u = info[.mediaURL] as? URL{
-            if self.useMt{
-                self.loadMTURL(u: u)
+            if self.noProcess{
+                self.play(useTiny: self.model.selectTinyPlay, url: u)
+            }else{
+                if self.model.selectGpu{
+                    self.processGPU(u: u)
+                }else{
+                    self.processCPU(url: u)
+                }
+               
             }
+            
         }
+    }
+    func render(image:CGImage){
+
+        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.showSize
+        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
+        self.render.screenSize = self.displayView.videoLayer.showSize
+        self.render.ratio = Float(480) / Float(320)
+        try! self.render.configuration.begin()
+       
+        try! self.render.render(image:image, drawable: draw)
+        try! self.render.configuration.commit()
+    }
+
+    @IBAction func play(segue:UIStoryboardSegue){
+        let v = segue.source as! SelectViewController
+        self.model = v.model
+    }
+    
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        let img = TinyDrawImage(width: 320 * 3, height: 480 * 3).draw { (ctx) in
+            ctx.setFillColor(UIColor.red.cgColor)
+            ctx.fill(CGRect(x: 10, y: 10, width: 200 * 3, height: 200 * 3))
+            let m = NSMutableAttributedString(string: "f0123456789af十大", attributes: [.foregroundColor:UIColor.white,.font:UIFont.systemFont(ofSize: 20 * 3)])
+            let img = #imageLiteral(resourceName: "mm").cgImage
+            let imgr = TinyTextImage(image: img!, font: CTFontCreateWithName("system" as CFString, 128, nil))
+            imgr.contentMode = .scaleToAcceptFill
+            let a = NSAttributedString.runDelegate(run: imgr)
+            let n = NSMutableAttributedString(string: "f9876543210af", attributes: [.foregroundColor:UIColor.yellow,.font:UIFont.systemFont(ofSize: 20 * 3)])
+            m.append(a)
+            m.append(n)
+            let frame = TinyTextFrame(string:m, range: CFRange(location: 0, length: m.length), path: CGPath(rect: CGRect(x: 10, y: 10, width: 200 * 3, height: 200 * 3), transform: nil))
+           
+            frame.draw(ctx: ctx)
+        }
+        self.render(image: img!)
+
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let v = segue.destination as! SelectViewController
+        v.model = self.model
+    }
+    
+    
+    var model:ConfigModel = ConfigModel(selectGpu: true, selectTinyPlay: true, url: nil)
+}
+
+struct ConfigModel {
+    var selectGpu:Bool
+    var selectTinyPlay:Bool
+    var url:URL?
+}
+
+class SelectViewController: UIViewController{
+
+    @IBOutlet weak var selectGpu:UISwitch!
+    @IBOutlet weak var selectTinyPlay:UISwitch!
+    
+    var model:ConfigModel = ConfigModel(selectGpu: true, selectTinyPlay: true, url: nil)
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.selectGpu.isOn = self.model.selectGpu
+        self.selectTinyPlay.isOn = self.model.selectTinyPlay
+    }
+    @IBAction func selectGpuAction(_ sender: UISwitch) {
+        self.model.selectGpu = sender.isOn
+    }
+    @IBAction func selectTinyPlayAction(_ sender: UISwitch) {
+        self.model.selectTinyPlay = sender.isOn
     }
 }

@@ -403,7 +403,7 @@ public class TinyAssetVideoProcessOut:TinyVideoProcessOutput{
     
     
     public var videoFrameRate:Int = 30
-    public var videoBitRate:Double = 5 * 1024 * 1024
+    public var videoBitRate:Double = 8 * 1024 * 1024
     public var audioSampleRate:Double = 44100
     public var audioBitRate:Double = 64000
     public var numberOfChannel:Int = 2

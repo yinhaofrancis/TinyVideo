@@ -23,7 +23,7 @@ extension CMSampleBuffer{
 public class TinyAssetVideoTrack{
     
     public var videoFrameRate:Int = 30
-    public var videoBitRate:Double = 1 * 1024 * 1024
+    public var videoBitRate:Double = 8 * 1024 * 1024
     public var audioSampleRate:Double = 44100
     public var audioBitRate:Double = 64000
     public var numberOfChannel:Int = 2
@@ -147,8 +147,6 @@ public class TinyAssetVideoTrack{
         let compress:[String:Any] = [
             AVVideoAverageBitRateKey:self.videoBitRate,
             AVVideoExpectedSourceFrameRateKey:self.videoFrameRate,
-//            AVVideoQualityKey:self.quality
-//            AVVideoProfileLevelKey:AVVideoProfileLevelH264HighAutoLevel
         ]
         
         var vset:[String:Any] = [
