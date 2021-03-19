@@ -31,6 +31,7 @@
 		7D0BAC7E1E66F3FFB5E01282 /* TinyVideo.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TinyVideo.podspec; path = ../TinyVideo.podspec; sourceTree = "<group>"; };
 		886C58040B90AE86222DA943 /* Pods-TinyVideo_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TinyVideo_Example.debug.xcconfig"; path = "Target Support Files/Pods-TinyVideo_Example/Pods-TinyVideo_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		A19F998ABF2D885E5994278F /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		A94E71DC25EA98B20011C760 /* TinyVideo_Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TinyVideo_Example.entitlements; sourceTree = "<group>"; };
 		B29429AB8584851EA7DA1AF0 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -49,6 +50,7 @@
 		607FACC71AFB9204008FA782 = {
 			isa = PBXGroup;
 			children = (
+				A94E71DC25EA98B20011C760 /* TinyVideo_Example.entitlements */,
 				607FACF51AFB993E008FA782 /* Podspec Metadata */,
 				607FACD21AFB9204008FA782 /* Example for TinyVideo */,
 				607FACD11AFB9204008FA782 /* Products */,
@@ -374,6 +376,7 @@
 			baseConfigurationReference = 886C58040B90AE86222DA943 /* Pods-TinyVideo_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TinyVideo_Example.entitlements;
 				DEVELOPMENT_TEAM = W8LHF9DL7C;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -385,8 +388,10 @@
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -395,6 +400,7 @@
 			baseConfigurationReference = 43EE8B7F91E93D1AD99E3C32 /* Pods-TinyVideo_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TinyVideo_Example.entitlements;
 				DEVELOPMENT_TEAM = W8LHF9DL7C;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -406,8 +412,10 @@
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

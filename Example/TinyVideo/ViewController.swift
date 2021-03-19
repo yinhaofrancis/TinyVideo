@@ -51,22 +51,21 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         self.go(sigma: 50)
     }
     func go(sigma:Float){
-//        let a =  #imageLiteral(resourceName: "mm").cgImage!
-//
-//        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
-//        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
+        let a =  #imageLiteral(resourceName: "mm").cgImage!
+
+        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
+        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.renderSize
         guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
         
-//        self.render.screenSize = self.displayView.videoLayer.showSize
-//        self.render.ratio = Float(1280) / Float(720)
-//        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
+        self.render.screenSize = self.displayView.videoLayer.showSize
+        self.render.ratio = Float(1280) / Float(720)
+        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
         
-        let v = TinyView(frame: Rect(x: 0, y: 10 + sigma, w: 640, h: 500), configuration: .defaultConfiguration, vertex: "vertexShader", fragment: "testShader")
         
         
         try! TinyMetalConfiguration.defaultConfiguration.begin()
-        try! self.ren?.render(layer: v, drawable: draw)
-//        try! self.render.render(texture: rt,drawable: draw)
+//        try! self.ren?.render(layer: v, drawable: draw)
+        try! self.render.render(texture: rt,drawable: draw)
         try! TinyMetalConfiguration.defaultConfiguration.commit()
     }
     public func loadMTURL(u:URL){
