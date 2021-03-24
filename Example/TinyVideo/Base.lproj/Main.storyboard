@@ -87,9 +87,20 @@
                                     <constraint firstAttribute="height" constant="44" id="J9c-aG-8cg"/>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="128" id="meB-qH-6vA"/>
                                 </constraints>
-                                <state key="normal" title="Button"/>
+                                <state key="normal" title="下载"/>
                                 <connections>
                                     <action selector="download:" destination="OAI-qO-EsS" eventType="touchUpInside" id="B2K-P8-Q05"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HFX-7N-N42">
+                                <rect key="frame" x="123.5" y="114" width="128" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="128" id="Xj2-vG-Ehp"/>
+                                    <constraint firstAttribute="height" constant="44" id="jOo-Nl-hfs"/>
+                                </constraints>
+                                <state key="normal" title="播放"/>
+                                <connections>
+                                    <action selector="play:" destination="OAI-qO-EsS" eventType="touchUpInside" id="Mta-e4-a6M"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -97,6 +108,8 @@
                         <constraints>
                             <constraint firstItem="mc5-if-dWw" firstAttribute="top" secondItem="yZm-X6-OYq" secondAttribute="bottom" constant="20" id="DFW-lR-xKI"/>
                             <constraint firstAttribute="trailingMargin" secondItem="mc5-if-dWw" secondAttribute="trailing" id="Mdy-Xh-vMc"/>
+                            <constraint firstItem="HFX-7N-N42" firstAttribute="centerX" secondItem="spU-QX-HFA" secondAttribute="centerX" id="W2Q-Oo-P1i"/>
+                            <constraint firstItem="HFX-7N-N42" firstAttribute="top" secondItem="6g4-h2-Jxq" secondAttribute="bottom" constant="8" symbolic="YES" id="Xtx-RC-D4L"/>
                             <constraint firstItem="mc5-if-dWw" firstAttribute="leading" secondItem="spU-QX-HFA" secondAttribute="leadingMargin" id="epl-1l-5OW"/>
                             <constraint firstItem="6g4-h2-Jxq" firstAttribute="top" secondItem="mc5-if-dWw" secondAttribute="bottom" constant="8" symbolic="YES" id="fZj-9m-BAZ"/>
                             <constraint firstItem="6g4-h2-Jxq" firstAttribute="centerX" secondItem="spU-QX-HFA" secondAttribute="centerX" id="nbL-o9-JWH"/>
@@ -106,6 +119,7 @@
                     <navigationItem key="navigationItem" id="h4j-IY-cS4"/>
                     <connections>
                         <outlet property="url" destination="mc5-if-dWw" id="NuY-Mc-2CN"/>
+                        <segue destination="vXZ-lx-hvc" kind="show" identifier="play" id="FCx-2N-LNp"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8ZC-vB-MM9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -159,7 +173,7 @@
                                 </subviews>
                             </stackView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o3r-Or-v2F">
-                                <rect key="frame" x="172" y="142" width="31" height="64"/>
+                                <rect key="frame" x="172" y="559" width="31" height="64"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="64" id="YJG-4i-P03"/>
                                 </constraints>
@@ -168,6 +182,16 @@
                                     <segue destination="QQr-Bp-tbj" kind="unwind" unwindAction="playWithSegue:" id="908-dN-jcG"/>
                                 </connections>
                             </button>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="ee7-8O-d4F">
+                                <rect key="frame" x="34" y="98" width="307" height="31"/>
+                                <connections>
+                                    <action selector="changegama:" destination="UHS-yt-vAq" eventType="valueChanged" id="eXw-7B-joD"/>
+                                </connections>
+                            </slider>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VLA-h8-t4B" customClass="TinyVideoView" customModule="TinyVideo">
+                                <rect key="frame" x="36" y="148" width="303" height="391"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
@@ -175,10 +199,17 @@
                             <constraint firstItem="Md9-fM-7YF" firstAttribute="leading" secondItem="eTP-A3-bCz" secondAttribute="leadingMargin" id="DPy-Zk-8wE"/>
                             <constraint firstItem="Md9-fM-7YF" firstAttribute="top" secondItem="uMg-Pn-CSv" secondAttribute="bottom" constant="8" id="LHe-Rj-3G2"/>
                             <constraint firstAttribute="trailingMargin" secondItem="uMg-Pn-CSv" secondAttribute="trailing" id="Ldb-47-hh8"/>
-                            <constraint firstItem="o3r-Or-v2F" firstAttribute="top" secondItem="Md9-fM-7YF" secondAttribute="bottom" constant="64" id="Smb-Cv-9VB"/>
                             <constraint firstItem="uMg-Pn-CSv" firstAttribute="leading" secondItem="eTP-A3-bCz" secondAttribute="leadingMargin" id="YCq-yI-fJy"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="VLA-h8-t4B" secondAttribute="trailing" constant="20" id="a6C-ma-xQ5"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="ee7-8O-d4F" secondAttribute="trailing" constant="20" id="adP-WP-GVo"/>
+                            <constraint firstItem="VLA-h8-t4B" firstAttribute="top" secondItem="ee7-8O-d4F" secondAttribute="bottom" constant="20" id="bz4-7Q-xie"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Md9-fM-7YF" secondAttribute="trailing" id="cVh-yC-8y2"/>
+                            <constraint firstItem="ee7-8O-d4F" firstAttribute="leading" secondItem="eTP-A3-bCz" secondAttribute="leadingMargin" constant="20" id="cvg-t2-fwh"/>
+                            <constraint firstItem="o3r-Or-v2F" firstAttribute="top" secondItem="VLA-h8-t4B" secondAttribute="bottom" constant="20" id="dcQ-Zn-w00"/>
+                            <constraint firstItem="ee7-8O-d4F" firstAttribute="top" secondItem="Md9-fM-7YF" secondAttribute="bottom" constant="20" id="gmm-fo-zeb"/>
                             <constraint firstItem="o3r-Or-v2F" firstAttribute="centerX" secondItem="eTP-A3-bCz" secondAttribute="centerX" id="iK4-Up-Ztc"/>
+                            <constraint firstItem="aXn-4S-pG1" firstAttribute="top" secondItem="o3r-Or-v2F" secondAttribute="bottom" id="yGQ-sh-vwl"/>
+                            <constraint firstItem="VLA-h8-t4B" firstAttribute="leading" secondItem="eTP-A3-bCz" secondAttribute="leadingMargin" constant="20" id="zNZ-Qg-90z"/>
                         </constraints>
                     </view>
                     <toolbarItems/>
@@ -186,6 +217,7 @@
                         <nil key="title"/>
                     </navigationItem>
                     <connections>
+                        <outlet property="displayView" destination="VLA-h8-t4B" id="nUn-UU-rhM"/>
                         <outlet property="selectGpu" destination="vpq-4t-4bX" id="z9A-Fy-0gB"/>
                         <outlet property="selectTinyPlay" destination="YyV-93-RHc" id="ecu-gd-5su"/>
                     </connections>
@@ -279,6 +311,9 @@
             <point key="canvasLocation" x="322" y="-40"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="FCx-2N-LNp"/>
+    </inferredMetricsTieBreakers>
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

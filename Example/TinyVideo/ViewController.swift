@@ -15,8 +15,12 @@ import MetalKit
 
 class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate {
 
+    var url:URL?
     override func viewDidLoad() {
         super.viewDidLoad()
+        if let u = self.url{
+            self.play(useTiny: false, url: u)
+        }
     }
     
     @IBOutlet weak var displayView: TinyVideoView!
@@ -61,35 +65,17 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     @IBAction func pickpImage() {
         self.loadlib(noProcess: true)
     }
-    func go(sigma:Float){
-        let a =  #imageLiteral(resourceName: "mm").cgImage!
-
-        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
-        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.showSize
-        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
-        
-        self.render.screenSize = self.displayView.videoLayer.showSize
-        self.render.ratio = Float(1280) / Float(720)
-        guard let rt = comp.filterTexture(pixel: text, w: 720, h: 1280) else { return }
-        
-        
-        
-        try! TinyMetalConfiguration.defaultConfiguration.begin()
-//        try! self.ren?.render(layer: v, drawable: draw)
-        try! self.render.render(texture: rt,drawable: draw)
-        try! TinyMetalConfiguration.defaultConfiguration.commit()
-    }
     
     func processGPU(u:URL){
         let trace = try! TinyAssetVideoTrack(asset: AVAsset(url: u))
-        let f = TinyGaussBackgroundFilter(configuration: TinyMetalConfiguration.defaultConfiguration)
-        f?.w = 480
-        f?.h = 720
+        let f = TinyGaussBackgroundFilter(configuration: TinyMetalConfiguration.defaultConfiguration,sigma: self.model.sigma)
+        f?.w = 720
+        f?.h = 1080
         trace.filter = f
-        try! trace.export(w:480, h: 720) { (u, s) in
+        try! trace.export(w:720,h: 1080) { (u, s) in
             if let uu = u {
                 DispatchQueue.main.async {
-                    self.play(useTiny: self.model.selectTinyPlay, url: uu)
+                    self.saveVideo(url: uu)
                 }
             }
 
@@ -104,15 +90,15 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
             let outUrl = try self.filecreate(name: "a", ext: "mp4")
             let input = try TinyAssetVideoProcessInput(asset: AVAsset(url: url))
             let output = try TinyAssetVideoProcessOut(url: outUrl, type: .mp4)
-            output.setSourceSize(size: CGSize(width: 144, height: 360))
-            filter.screenSize = CGSize(width: 144, height: 360)
+            output.setSourceSize(size: CGSize(width: 720, height: 1080))
+            filter.screenSize = CGSize(width: 720, height: 1080)
             self.session = TinyVideoSession(input: input, out: output, process: process)
             self.session?.run { [weak self]i in
                 if i == nil{
                     if let ws = self{
                         DispatchQueue.main.async {
-                            ws.play(useTiny: ws.model.selectTinyPlay, url: outUrl)
                             ws.session = nil
+                            ws.saveVideo(url: outUrl)
                         }
                     }
                     
@@ -121,6 +107,20 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         } catch  {
             print(error)
         }
+    }
+    func saveVideo(url:URL){
+        let a = UIAlertController(title: "是否保存", message: "是否保存到相册", preferredStyle: .actionSheet)
+        a.addAction(UIAlertAction(title: "保存", style: .default, handler: { (a) in
+            TinyVideoManager.saveVideo(url: url) { (id) in
+                
+            }
+        }))
+        
+        a.addAction(UIAlertAction(title: "播放", style: .default, handler: { (a) in
+            self.play(useTiny: self.model.selectTinyPlay, url: url)
+        }))
+        self.present(a, animated: true, completion: nil)
+        
     }
     func loadlib(noProcess:Bool){
         let img = UIImagePickerController()
@@ -189,12 +189,13 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     }
     
     
-    var model:ConfigModel = ConfigModel(selectGpu: true, selectTinyPlay: true, url: nil)
+    var model:ConfigModel = ConfigModel(selectGpu: true, selectTinyPlay: true,sigma: 30, url: nil)
 }
 
 struct ConfigModel {
     var selectGpu:Bool
     var selectTinyPlay:Bool
+    var sigma:Float
     var url:URL?
 }
 
@@ -202,8 +203,9 @@ class SelectViewController: UIViewController{
 
     @IBOutlet weak var selectGpu:UISwitch!
     @IBOutlet weak var selectTinyPlay:UISwitch!
-    
-    var model:ConfigModel = ConfigModel(selectGpu: true, selectTinyPlay: true, url: nil)
+    @IBOutlet weak var displayView: TinyVideoView!
+    var render = TinyTextureRender(configuration: .defaultConfiguration)
+    var model:ConfigModel = ConfigModel(selectGpu: true, selectTinyPlay: true,sigma: 30, url: nil)
     override func viewDidLoad() {
         super.viewDidLoad()
         self.selectGpu.isOn = self.model.selectGpu
@@ -214,5 +216,30 @@ class SelectViewController: UIViewController{
     }
     @IBAction func selectTinyPlayAction(_ sender: UISwitch) {
         self.model.selectTinyPlay = sender.isOn
+    }
+    @IBAction func changegama(_ sender: UISlider) {
+        self.go(sigma: sender.value)
+        self.model.sigma = sender.value
+    }
+    
+    func go(sigma:Float){
+        let a =  #imageLiteral(resourceName: "mm").cgImage!
+
+        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
+        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.showSize
+        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
+        
+        self.render.screenSize = self.displayView.videoLayer.showSize
+        self.render.ratio = Float(1280) / Float(720)
+        let comp = TinyGaussBackgroundFilter(configuration: self.render.configuration,sigma:sigma)
+        
+        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
+        
+        
+        
+        try! self.render.configuration.begin()
+//        try! self.ren?.render(layer: v, drawable: draw)
+        try! self.render.render(texture: rt,drawable: draw)
+        try! self.render.configuration.commit()
     }
 }
