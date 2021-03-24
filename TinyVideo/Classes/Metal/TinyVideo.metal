@@ -12,6 +12,7 @@ struct TinyVertexIn{
     float2 textureVX [[attribute(1)]];
 };
 
+
 vertex TinyVertex vertexShader(TinyVertexIn vertices [[stage_in]]){
     TinyVertex r;
     r.location = vertices.location;
@@ -22,7 +23,6 @@ vertex TinyVertex vertexShader(TinyVertexIn vertices [[stage_in]]){
 fragment half4 fragmentShader(TinyVertex in [[stage_in]],
                               const texture2d<half> texture [[texture(0)]],
                               const sampler textureSampler [[sampler(0)]]){
-//    constexpr sampler textureSampler(mag_filter::linear,min_filter::linear,filter::linear,mip_filter::linear);
     half4 color = texture.sample(textureSampler, in.textureVX);
     return half4(color.xyz,1);
 }
@@ -95,5 +95,6 @@ kernel void imageTransform(const texture2d<half, access::sample> from [[ texture
     half4 color = from.sample(imgSample, sp);
     to.write(color, gid);
 }
+
 
 
