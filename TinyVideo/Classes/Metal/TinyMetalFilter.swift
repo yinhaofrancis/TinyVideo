@@ -11,22 +11,25 @@ import MetalPerformanceShaders
 
 public protocol TinyMetalFilter{
     func filter(pixel:CVPixelBuffer)->CVPixelBuffer?
-    func filterTexture(pixel:MTLTexture,w:Float,h:Float)->MTLTexture?
+    func filterTexture(pixel:[MTLTexture],w:Float,h:Float)->MTLTexture?
 }
 public class TinyGaussBackgroundFilter:TinyMetalFilter{
     public func filter(pixel: CVPixelBuffer) -> CVPixelBuffer? {
         guard let px1 = self.tiny.configuration.createTexture(img: pixel) else { return nil }
-        guard let px = self.filterTexture(pixel: px1, w: self.w, h: self.h) else { return nil }
+        guard let px = self.filterTexture(pixel: [px1], w: self.w, h: self.h) else { return nil }
         return TinyMetalConfiguration.createPixelBuffer(texture: px)
     }
     
-    public func filterTexture(pixel:MTLTexture,w:Float,h:Float)->MTLTexture?{
+    public func filterTexture(pixel:[MTLTexture],w:Float,h:Float)->MTLTexture?{
         autoreleasepool { () -> MTLTexture? in
+            if(pixel.count < 1){
+                return nil
+            }
             do {
-                let ow = Float(pixel.width)
-                let oh = Float(pixel.height)
+                let ow = Float(pixel.first!.width)
+                let oh = Float(pixel.first!.height)
                 
-                let px1 = pixel
+                let px1 = pixel.first!
                 guard let px2 = self.tiny.configuration.createTexture(width: Int(w), height: Int(h),store: .private) else { return nil }
                 guard let px3 = self.tiny.configuration.createTexture(width: Int(w), height: Int(h)) else { return nil }
                 try self.tiny.configuration.begin()
@@ -42,7 +45,6 @@ public class TinyGaussBackgroundFilter:TinyMetalFilter{
                 return nil
             }
         }
-        
     }
     public init?(configuration:TinyMetalConfiguration) {
         do {
@@ -73,10 +75,13 @@ public class TinyTransformFilter:TinyMetalFilter{
         return nil
     }
     
-    public func filterTexture(pixel: MTLTexture, w: Float, h: Float) -> MTLTexture? {
-        autoreleasepool { () -> MTLTexture? in
+    public func filterTexture(pixel: [MTLTexture], w: Float, h: Float) -> MTLTexture? {
+        if(pixel.count < 1){
+            return nil
+        }
+        return autoreleasepool { () -> MTLTexture? in
             do {
-                let px1 = pixel
+                let px1 = pixel.first!
                 self.transform = simd_float3x3([
                                                 simd_float3(0, -1,0),
                                                 simd_float3(1, 0, 0),
