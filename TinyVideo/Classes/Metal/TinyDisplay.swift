@@ -55,11 +55,11 @@ public class TinyVideoLayer:CAMetalLayer{
         var result:MTLTexture?
         result = texture
         if let p = self.player , p.currentPresentTransform != .identity{
-            guard let outTexture = self.videoTransformFilter.filterTexture(pixel: texture, w: Float(texture.height), h: Float(texture.width)) else { return nil }
+            guard let outTexture = self.videoTransformFilter.filterTexture(pixel: [texture], w: Float(texture.height), h: Float(texture.width)) else { return nil }
             result = outTexture
         }
         if let filter = self.videoFilter{
-            result = filter.filterTexture(pixel: result!, w: Float(self.showSize.width)  * self.renderScale, h: Float(self.showSize.height) * self.renderScale)
+            result = filter.filterTexture(pixel: [result!], w: Float(self.showSize.width)  * self.renderScale, h: Float(self.showSize.height) * self.renderScale)
         }
         return result
     }

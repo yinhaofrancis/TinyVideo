@@ -65,6 +65,25 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     @IBAction func pickpImage() {
         self.loadlib(noProcess: true)
     }
+
+    func go(sigma:Float){
+        let a =  #imageLiteral(resourceName: "mm").cgImage!
+
+        let text = try! MTKTextureLoader(device: TinyMetalConfiguration.defaultConfiguration.device).newTexture(cgImage: a, options: nil)
+        self.displayView.videoLayer.drawableSize = self.displayView.videoLayer.showSize
+        guard let draw = self.displayView.videoLayer.nextDrawable() else { return  }
+        
+        self.render.screenSize = self.displayView.videoLayer.showSize
+        self.render.ratio = Float(1280) / Float(720)
+        
+        guard let rt = comp.filterTexture(pixel: [text], w: 720, h: 1280) else { return }
+        
+        
+        
+        try! TinyMetalConfiguration.defaultConfiguration.begin()
+        try! self.render.render(texture: rt,drawable: draw)
+        try! TinyMetalConfiguration.defaultConfiguration.commit()
+    }
     
     func processGPU(u:URL){
         let trace = try! TinyAssetVideoTrack(asset: AVAsset(url: u))
@@ -233,7 +252,7 @@ class SelectViewController: UIViewController{
         self.render.ratio = Float(1280) / Float(720)
         let comp = TinyGaussBackgroundFilter(configuration: self.render.configuration,sigma:sigma)
         
-        guard let rt = comp?.filterTexture(pixel: text, w: 720, h: 1280) else { return }
+        guard let rt = comp?.filterTexture(pixel: [text], w: 720, h: 1280) else { return }
         
         
         
