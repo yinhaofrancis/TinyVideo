@@ -21,7 +21,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mFp-Jx-3VN" customClass="TinyVideoView" customModule="TinyVideo">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="574"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                         </subviews>
@@ -77,7 +77,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6JN-a0-Wjh" customClass="TinyVideoWebView" customModule="TinyVideo_Example" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="574"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
                                     <wkPreferences key="preferences"/>
@@ -92,17 +92,48 @@
                             <constraint firstItem="6JN-a0-Wjh" firstAttribute="leading" secondItem="spU-QX-HFA" secondAttribute="leading" id="tg3-rT-VjB"/>
                         </constraints>
                     </view>
+                    <toolbarItems>
+                        <barButtonItem title="videoUrl" id="sdk-6y-YbQ">
+                            <connections>
+                                <action selector="hackVideo" destination="OAI-qO-EsS" id="15P-Mt-9mx"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem title="iframe" id="iex-He-Qtf">
+                            <connections>
+                                <action selector="openIframeUrl:" destination="OAI-qO-EsS" id="tLz-vp-iuU"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem title="download" id="LsD-6h-kf0">
+                            <connections>
+                                <action selector="download:" destination="OAI-qO-EsS" id="guk-BW-Ps0"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="h1K-be-63E"/>
+                        <barButtonItem title="back" id="Jef-0n-iTO">
+                            <connections>
+                                <action selector="boBack:" destination="OAI-qO-EsS" id="2bE-Zu-ft6"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" id="h4j-IY-cS4">
                         <nil key="title"/>
-                        <textField key="titleView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" id="pMq-v9-swT">
-                            <rect key="frame" x="50" y="5" width="266" height="34"/>
+                        <textField key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" id="pMq-v9-swT">
+                            <rect key="frame" x="8" y="5" width="308" height="34"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <mutableString key="text">https://m.baidu.com/video/page?pd=video_page&amp;nid=10120964363189773301&amp;sign=12242002539487555215&amp;word=%E7%A7%8B%E7%93%B7%E7%82%AB%E6%B7%B1%E5%A4%9C%E7%B4%A0%E9%A2%9C%E5%BD%95%E8%A7%86%E9%A2%91%E5%9B%9E%E5%BA%94%E4%BA%A7%E5%90%8E%E7%AA%81%E5%8F%91%E7%96%BE%E7%97%85%EF%BC%8C%E5%A3%B0%E9%9F%B3%E8%99%9A%E5%BC%B1%E6%B2%99%E5%93%91%E8%AE%A9%E7%B2%89%E4%B8%9D%E5%BF%83%E7%96%BC&amp;oword=%E7%99%BE%E5%BA%A6%E8%A7%86%E9%A2%91&amp;atn=index&amp;frsrcid=5373&amp;ext=%7B%22jsy%22%3A1%7D&amp;top=%7B%22sfhs%22%3A1%2C%22_hold%22%3A2%7D&amp;next_nid=5988919970543427725&amp;sl=4&amp;lid=11759372793614500789&amp;fr0=B&amp;fr1=C</mutableString>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <textInputTraits key="textInputTraits"/>
                         </textField>
-                        <barButtonItem key="rightBarButtonItem" title="Item" image="paperplane" catalog="system" id="0h6-zu-h26"/>
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="paperplane" catalog="system" id="0h6-zu-h26">
+                            <connections>
+                                <action selector="run" destination="OAI-qO-EsS" id="nde-aD-7Nq"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="textfield" destination="pMq-v9-swT" id="REY-SH-RPE"/>
+                        <outlet property="webView" destination="6JN-a0-Wjh" id="muW-Fo-h6H"/>
                         <segue destination="vXZ-lx-hvc" kind="show" identifier="play" id="FCx-2N-LNp"/>
                     </connections>
                 </viewController>
@@ -157,7 +188,7 @@
                                 </subviews>
                             </stackView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o3r-Or-v2F">
-                                <rect key="frame" x="172" y="559" width="31" height="64"/>
+                                <rect key="frame" x="172" y="510" width="31" height="64"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="64" id="YJG-4i-P03"/>
                                 </constraints>
@@ -173,7 +204,7 @@
                                 </connections>
                             </slider>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VLA-h8-t4B" customClass="TinyVideoView" customModule="TinyVideo">
-                                <rect key="frame" x="36" y="148" width="303" height="391"/>
+                                <rect key="frame" x="36" y="148" width="303" height="342"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                         </subviews>

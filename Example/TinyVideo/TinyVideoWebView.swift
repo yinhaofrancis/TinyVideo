@@ -8,7 +8,37 @@
 
 import UIKit
 import WebKit
+import TinyVideo
+import AVFoundation
+let js = """
+function hackWebVideo(){
+    let  videos = document.getElementsByTagName("video");
+    for (var i = 0; i < videos.length; i++){
+        window.webkit.messageHandlers.videoUrl.postMessage(videos[i].src);
+    }
+}
+function downloadWebVideo(){
+    let  videos = document.getElementsByTagName("video");
+    for (var i = 0; i < videos.length; i++){
+        window.webkit.messageHandlers.download.postMessage(videos[i].src);
+    }
+}
+
+function hackiframe(){
+    let  iframes = document.getElementsByTagName("iframe");
+    for (var i = 0; i < iframes.length; i++){
+        window.webkit.messageHandlers.iframeUrl.postMessage(iframes[i].src);
+    }
+}
+
+"""
+
 public class TinyVideoWebView: WKWebView {
+    
+    public typealias  HandleVideo = (TinyVideoResource<VideoDiskCache>)->Void
+    
+    public typealias  HandleUrl = (URL)->Void
+    
     public override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
     }
@@ -19,9 +49,24 @@ public class TinyVideoWebView: WKWebView {
     public override func didMoveToWindow() {
         super.didMoveToWindow()
         if self.window != nil{
+            self.configuration.allowsInlineMediaPlayback = true;
             self.addHandle(name: "videoUrl") { (msg) in
-                print(msg.body)
+                
+                guard let url = URL(string: msg.body as! String) else { return }
+                
+                guard let resource = TinyVideoResourceManager.shared.loadResource(url: url, identify: "") else { return }
+                
+                self.handleVideoAsset?(resource)
             }
+            self.addHandle(name: "iframeUrl") { (msg) in
+                guard let url = URL(string: msg.body as! String) else { return }
+                self.handleIframe?(url)
+            }
+            self.addHandle(name: "download") { (msg) in
+                guard let url = URL(string: msg.body as! String) else { return }
+                self.handleDownload?(url)
+            }
+            self.addScript(code: js)
         }
     }
     
@@ -34,6 +79,27 @@ public class TinyVideoWebView: WKWebView {
         self.configuration.userContentController.removeScriptMessageHandler(forName: name)
         self.configuration.userContentController.add(msgHandle, name: name)
     }
+    public func hackWebVideo(){
+        self.evaluateJavaScript("hackWebVideo()") { (a, e) in
+            guard let error = e else { return }
+            print(error)
+        }
+    }
+    public func hackIframe(){
+        self.evaluateJavaScript("hackiframe()") { (a, e) in
+            guard let error = e else { return }
+            print(error)
+        }
+    }
+    public func downloadWebVideo(){
+        self.evaluateJavaScript("downloadWebVideo()") { (a, e) in
+            guard let error = e else { return }
+            print(error)
+        }
+    }
+    public var handleVideoAsset:HandleVideo?
+    public var handleIframe:HandleUrl?
+    public var handleDownload:HandleUrl?
 }
 
 public class TinyWebMessageHandler:NSObject,WKScriptMessageHandler{

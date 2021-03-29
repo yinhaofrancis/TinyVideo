@@ -17,7 +17,7 @@
 		37A63F84757EE233A118CE0A18D0DF6F /* TinyLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD8451D550874B83B70681A9CE026193 /* TinyLayer.swift */; };
 		38A948799D653D74E498CF9085C00AD3 /* Pods-TinyVideo_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434D4F989B178B734DDD7CBE71A8215 /* Pods-TinyVideo_Example-dummy.m */; };
 		3C0CD6DBAF6082740A75F6C64A4149FC /* TinyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F19B89A82FF6C5F61E3FD3DD8C7572 /* TinyView.swift */; };
-		4B09EB33085DA933737F38582F310DF8 /* TinyVideoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9FD7FD21A27486484D1E377BAB076F /* TinyVideoManager.swift */; };
+		4B09EB33085DA933737F38582F310DF8 /* TinyVideoGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9FD7FD21A27486484D1E377BAB076F /* TinyVideoGallery.swift */; };
 		4DD38F01C62188B729375E16C83FAE24 /* LayerShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 772C30606247E5B85138537C4B226071 /* LayerShader.metal */; };
 		58EDDADF6D2B24F7D128D4CE8C341558 /* TinyMetalFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D450E54C6004CD644D0F625F80ECE5 /* TinyMetalFilter.swift */; };
 		5AC8DAA31EF9D724D2E08CAB5DF598A8 /* TinyAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55A89195A5C2BB5691F79F5B3BD9AA72 /* TinyAudioPlayer.swift */; };
@@ -85,7 +85,7 @@
 		B8D099D61DD184B18F588B52AE826525 /* Pods-TinyVideo_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-TinyVideo_Example.release.xcconfig"; sourceTree = "<group>"; };
 		BD8451D550874B83B70681A9CE026193 /* TinyLayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TinyLayer.swift; sourceTree = "<group>"; };
 		C2160D34CDCA27C7FCBAFE44B8EEA142 /* TinyVideo-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "TinyVideo-prefix.pch"; sourceTree = "<group>"; };
-		CD9FD7FD21A27486484D1E377BAB076F /* TinyVideoManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TinyVideoManager.swift; sourceTree = "<group>"; };
+		CD9FD7FD21A27486484D1E377BAB076F /* TinyVideoGallery.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TinyVideoGallery.swift; sourceTree = "<group>"; };
 		CF99E06656132B0F9912820414EDAB03 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DAB90604F1938E82F35DB030F03573CD /* TinyCompute.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TinyCompute.swift; sourceTree = "<group>"; };
 		DDEB38EC0B581CD9D68A98422BA22ED9 /* TinyVideo.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = TinyVideo.modulemap; sourceTree = "<group>"; };
@@ -248,7 +248,7 @@
 		C010D719B502FB68A671D06C76E6BD81 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
-				CD9FD7FD21A27486484D1E377BAB076F /* TinyVideoManager.swift */,
+				CD9FD7FD21A27486484D1E377BAB076F /* TinyVideoGallery.swift */,
 				A95C1414260EC73B0070E2AB /* TInyVideoResource.swift */,
 				A95C1418260EC7F30070E2AB /* TinyHash.swift */,
 			);
@@ -421,7 +421,7 @@
 				5F2763AC05A1B3508F6BC3E735E76234 /* TinyTextureRender.swift in Sources */,
 				281E5BB23FBB2D17FC6423B294BD7A10 /* TinyVideo-dummy.m in Sources */,
 				B988554727267DAFA4A96A8C2ADB3006 /* TinyVideo.metal in Sources */,
-				4B09EB33085DA933737F38582F310DF8 /* TinyVideoManager.swift in Sources */,
+				4B09EB33085DA933737F38582F310DF8 /* TinyVideoGallery.swift in Sources */,
 				90F1C8E890A2FD6854F92CB4059C57A3 /* TinyVideoPlayer.swift in Sources */,
 				9D73304E6142AF5EFED5EDB377194D5E /* TinyVideoTrack.swift in Sources */,
 				3C0CD6DBAF6082740A75F6C64A4149FC /* TinyView.swift in Sources */,

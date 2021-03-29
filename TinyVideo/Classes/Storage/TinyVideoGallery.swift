@@ -1,5 +1,5 @@
 //
-//  TinyVideoManager.swift
+//  TinyVideoGallery.swift
 //  TinyVideo_Example
 //
 //  Created by hao yin on 2021/3/20.
@@ -9,7 +9,7 @@
 import Foundation
 import Photos
 
-public class TinyVideoManager{
+public class TinyVideoGallery{
     class public func saveVideo(url:URL,callback:@escaping (String?)->Void){
         
         var id:String?

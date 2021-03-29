@@ -21,6 +21,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         if let u = self.url{
             self.play(useTiny: false, url: u)
         }
+        self.navigationController?.isToolbarHidden = true;
     }
     
     @IBOutlet weak var displayView: TinyVideoView!
@@ -130,7 +131,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     func saveVideo(url:URL){
         let a = UIAlertController(title: "是否保存", message: "是否保存到相册", preferredStyle: .actionSheet)
         a.addAction(UIAlertAction(title: "保存", style: .default, handler: { (a) in
-            TinyVideoManager.saveVideo(url: url) { (id) in
+            TinyVideoGallery.saveVideo(url: url) { (id) in
                 
             }
         }))

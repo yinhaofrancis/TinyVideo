@@ -21,6 +21,7 @@ public protocol FileCache{
     subscript(current:Int)->Data? { get  set }
     init(identify:String)
     var identify:String { get }
+    var isFull:Bool { get }
     mutating func  config(size:Int,type:String)
 }
 public let pageSize:Int = 512 * 1024
@@ -159,7 +160,7 @@ public struct VideoDiskCache:FileCache{
         }
     }
     public var localUrl:URL?{
-        if let url = VideoDiskCache.cacheDic?.appendingPathComponent(self.identify){
+        if let url = VideoDiskCache.cacheDic?.appendingPathComponent(self.identify).appendingPathExtension("mp4"){
             if !FileManager.default.fileExists(atPath: url.path){
                 FileManager.default.createFile(atPath: url.path, contents: nil, attributes: nil)
                 let u = url.appendingPathExtension("map")
@@ -186,20 +187,21 @@ public struct VideoDiskCache:FileCache{
         }
         return nil
     }
-    var isFull:Bool{
+    public var isFull:Bool{
         self.cacheInfo.map.count == 1 && self.cacheInfo.map.first!.upperBound - self.cacheInfo.map.first!.lowerBound == self.cacheInfo.contentSize - 1
     }
 }
 public class TinyVideoResource<T:FileCache>:NSObject,AVAssetResourceLoaderDelegate{
     
     public typealias CallBack = (Data?,Error?)->Void
-    
+    public typealias DownloadSuccessCallback = (URL?)->Void
     let url:URL
     var sem:DispatchSemaphore = DispatchSemaphore(value: 1)
     var cache:T
     var queue:DispatchQueue
     var identify:String
     var tasks:[Int:URLSessionTask] = [:]
+    public var downloadSuccess:DownloadSuccessCallback?
     public init?(url:URL,identify:String,queue:DispatchQueue) {
         self.queue = queue
         self.url = url;
@@ -262,12 +264,12 @@ public class TinyVideoResource<T:FileCache>:NSObject,AVAssetResourceLoaderDelega
         if self.cache.cacheInfo.contentSize <= 0{
             var req = URLRequest(url: self.url)
             req.httpMethod = "head"
-            let task = session.dataTask(with: req) {(d, re, e) in
+            let task = TinyVideoResourceManager.shared.dataTask(with: req) {[weak self](d, re, e) in
                 if let httprep = re as? HTTPURLResponse{
                     if let u = (httprep.allHeaderFields["Content-Length"] as? String){
                         let size = Int(u) ?? 0
                         if (size > 0){
-                            self.cache.config(size: size, type: AVFileType.mp4.rawValue)
+                            self?.cache.config(size: size, type: AVFileType.mp4.rawValue)
                             callback?(d,e)
                             return
                         }
@@ -291,8 +293,9 @@ public class TinyVideoResource<T:FileCache>:NSObject,AVAssetResourceLoaderDelega
             }
         }else{
             var req = URLRequest(url: self.url)
-            req.addValue("bytes=\(index)-\(index + pageSize - 1)", forHTTPHeaderField: "Range")
-            let task = session.dataTask(with: req) { [weak self](d, re, e) in
+            let last = (index + pageSize - 1) > self.cache.cacheInfo.contentSize ?  self.cache.cacheInfo.contentSize - 1 : index + pageSize - 1
+            req.addValue("bytes=\(index)-\(last)", forHTTPHeaderField: "Range")
+            let task = TinyVideoResourceManager.shared.dataTask(with: req) { [weak self](d, re, e) in
                 if let httprep = re as? HTTPURLResponse{
                     if httprep.statusCode == 206 && e == nil && (d?.count ?? 0) > 0 {
                         var nd = Data()
@@ -300,8 +303,13 @@ public class TinyVideoResource<T:FileCache>:NSObject,AVAssetResourceLoaderDelega
                         self?.cache[index] = nd
                         callback?(nd,nil)
                     }else{
-                        let err = NSError(domain: "download error", code: 1, userInfo: nil)
-                        callback?(d,err)
+                        if httprep.statusCode == 416 {
+                            let err = NSError(domain: "download error", code: 0, userInfo: nil)
+                            callback?(d,err)
+                        }else{
+                            let err = NSError(domain: "download error", code: 1, userInfo: nil)
+                            callback?(d,err)
+                        }
                     }
                 }else{
                     let err = NSError(domain: "download error", code: 1, userInfo: nil)
@@ -333,26 +341,66 @@ public class TinyVideoResource<T:FileCache>:NSObject,AVAssetResourceLoaderDelega
     }
     
 }
-let session:URLSession = URLSession(configuration: .background(withIdentifier: "TinyVideoResource.session"))
+
 
 public let backgroundId = "TinyVideoResource.session"
 
-public class TinyVideoResourceManager:NSObject{
+public class TinyVideoResourceManager:NSObject,URLSessionDataDelegate{
+    
+    var queue:DispatchQueue
+    
+    public typealias SessionCallback = (Data?,URLResponse?,Error?)->Void
+    
+    public class SessionData{
+        var callback:SessionCallback?
+        var data:Data?
+    }
+    
+    var session:URLSession!
     
     var loader: [URL:TinyVideoResource<VideoDiskCache>] = [:]
+    
+    var tasks:[URLSessionTask:SessionData] = [:]
     
     @objc public static var shared:TinyVideoResourceManager = {
         TinyVideoResourceManager()
     }()
-    var queue:DispatchQueue
+    
     @objc public func load(url:URL,identify:String,preload:Bool = false)->AVAsset?{
+        self.loadResource(url: url, identify: identify, preload: preload)?.asset
+    }
+    public func loadResource(url:URL,identify:String,preload:Bool = false)->TinyVideoResource<VideoDiskCache>?{
         let a = TinyVideoResource<VideoDiskCache>(url: url,identify: identify,queue: self.queue)
         self.loader[url] = a;
-       
-        return a?.asset
+        return a
     }
+    public func dataTask(with:URLRequest,callback:SessionCallback?)->URLSessionDataTask{
+        let task = self.session.dataTask(with: with)
+        let sd = SessionData()
+        sd.data = Data()
+        sd.callback = callback
+        self.tasks[task] = sd;
+        return task
+    }
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        if self.tasks[dataTask]?.data == nil{
+            self.tasks[dataTask]?.data = data
+        }else{
+            self.tasks[dataTask]?.data?.append(data)
+        }
+    }
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        let data =  self.tasks[task]?.data
+        self.tasks[task]?.callback?(data,task.response,error)
+        self.tasks[task] = nil;
+    }
+
+    
+    
     public override init() {
         self.queue = DispatchQueue(label: "PEVideoResourceManager", qos: .background, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
+        super.init()
+        self.session = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
     }
     public func download(url:URL,indx:Int,identify:String,callback: @escaping (URL?)->Void){
         var old = self.loader[url]
@@ -363,7 +411,7 @@ public class TinyVideoResourceManager:NSObject{
             callback(nil)
             return
         }
-        if(indx >= a.cache.cacheInfo.contentSize){
+        if(a.cache.isFull){
             callback(a.cache.localUrl)
             return
         }
@@ -373,11 +421,23 @@ public class TinyVideoResourceManager:NSObject{
                     if(e == nil){
                         self.download(url: url, indx: indx + pageSize,identify: identify, callback: callback)
                     }else{
-                        callback(nil)
+                        if(a.cache.isFull){
+                            callback(a.cache.localUrl)
+                            return
+                        }else{
+                            callback(nil)
+                            return
+                        }
                     }
                 }
             }else{
-                callback(nil)
+                if(a.cache.isFull){
+                    callback(a.cache.localUrl)
+                    return
+                }else{
+                    callback(nil)
+                    return
+                }
             }
         })
     }
@@ -395,6 +455,7 @@ public class TinyVideoResourceManager:NSObject{
         }
         if(a.cache.isFull){
             callback(a.cache.localUrl)
+            a.downloadSuccess?(a.cache.localUrl)
         }else{
             a.queue.async {
                 a.sem.wait()
@@ -407,4 +468,3 @@ public class TinyVideoResourceManager:NSObject{
         }
     }
 }
-
