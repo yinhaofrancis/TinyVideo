@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,7 +22,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mFp-Jx-3VN" customClass="TinyVideoView" customModule="TinyVideo">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="574"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                         </subviews>
@@ -120,7 +121,7 @@
                         <textField key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" id="pMq-v9-swT">
                             <rect key="frame" x="8" y="5" width="308" height="34"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <mutableString key="text">https://m.baidu.com/video/page?pd=video_page&amp;nid=10120964363189773301&amp;sign=12242002539487555215&amp;word=%E7%A7%8B%E7%93%B7%E7%82%AB%E6%B7%B1%E5%A4%9C%E7%B4%A0%E9%A2%9C%E5%BD%95%E8%A7%86%E9%A2%91%E5%9B%9E%E5%BA%94%E4%BA%A7%E5%90%8E%E7%AA%81%E5%8F%91%E7%96%BE%E7%97%85%EF%BC%8C%E5%A3%B0%E9%9F%B3%E8%99%9A%E5%BC%B1%E6%B2%99%E5%93%91%E8%AE%A9%E7%B2%89%E4%B8%9D%E5%BF%83%E7%96%BC&amp;oword=%E7%99%BE%E5%BA%A6%E8%A7%86%E9%A2%91&amp;atn=index&amp;frsrcid=5373&amp;ext=%7B%22jsy%22%3A1%7D&amp;top=%7B%22sfhs%22%3A1%2C%22_hold%22%3A2%7D&amp;next_nid=5988919970543427725&amp;sl=4&amp;lid=11759372793614500789&amp;fr0=B&amp;fr1=C</mutableString>
+                            <string key="text">https://m.baidu.com/video/page?pd=video_page&amp;nid=10120964363189773301&amp;sign=12242002539487555215&amp;word=%E7%A7%8B%E7%93%B7%E7%82%AB%E6%B7%B1%E5%A4%9C%E7%B4%A0%E9%A2%9C%E5%BD%95%E8%A7%86%E9%A2%91%E5%9B%9E%E5%BA%94%E4%BA%A7%E5%90%8E%E7%AA%81%E5%8F%91%E7%96%BE%E7%97%85%EF%BC%8C%E5%A3%B0%E9%9F%B3%E8%99%9A%E5%BC%B1%E6%B2%99%E5%93%91%E8%AE%A9%E7%B2%89%E4%B8%9D%E5%BF%83%E7%96%BC&amp;oword=%E7%99%BE%E5%BA%A6%E8%A7%86%E9%A2%91&amp;atn=index&amp;frsrcid=5373&amp;ext=%7B%22jsy%22%3A1%7D&amp;top=%7B%22sfhs%22%3A1%2C%22_hold%22%3A2%7D&amp;next_nid=5988919970543427725&amp;sl=4&amp;lid=11759372793614500789&amp;fr0=B&amp;fr1=C</string>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <textInputTraits key="textInputTraits"/>
                         </textField>
@@ -188,7 +189,7 @@
                                 </subviews>
                             </stackView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o3r-Or-v2F">
-                                <rect key="frame" x="172" y="510" width="31" height="64"/>
+                                <rect key="frame" x="172" y="559" width="31" height="64"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="64" id="YJG-4i-P03"/>
                                 </constraints>
@@ -204,7 +205,7 @@
                                 </connections>
                             </slider>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VLA-h8-t4B" customClass="TinyVideoView" customModule="TinyVideo">
-                                <rect key="frame" x="36" y="148" width="303" height="342"/>
+                                <rect key="frame" x="36" y="148" width="303" height="391"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                         </subviews>
@@ -311,6 +312,26 @@
                                             <segue destination="OAI-qO-EsS" kind="show" id="TiI-op-GE3"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="2cs-eP-DLo" style="IBUITableViewCellStyleDefault" id="6vr-fb-6Xx">
+                                        <rect key="frame" x="0.0" y="115" width="375" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6vr-fb-6Xx" id="9gg-DD-fNp">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="音频" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="2cs-eP-DLo">
+                                                    <rect key="frame" x="16" y="0.0" width="343" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="t1T-oq-GRV" kind="show" id="Iao-Yu-zg6"/>
+                                        </connections>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -325,9 +346,49 @@
             </objects>
             <point key="canvasLocation" x="322" y="-40"/>
         </scene>
+        <!--Audio View Controller-->
+        <scene sceneID="NpK-9T-PyQ">
+            <objects>
+                <viewController id="t1T-oq-GRV" customClass="audioViewController" customModule="TinyAudio" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Vpv-oz-3Gv">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j2A-Pd-hJQ">
+                                <rect key="frame" x="165" y="53" width="45" height="30"/>
+                                <state key="normal" title="record"/>
+                                <connections>
+                                    <action selector="endRecord:" destination="t1T-oq-GRV" eventType="touchUpInside" id="LLX-5i-cft"/>
+                                    <action selector="record:" destination="t1T-oq-GRV" eventType="touchDown" id="B9i-JM-u4D"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5tb-Yk-744">
+                                <rect key="frame" x="172.5" y="138" width="30" height="30"/>
+                                <state key="normal" title="play"/>
+                                <connections>
+                                    <action selector="endPlay:" destination="t1T-oq-GRV" eventType="touchUpInside" id="VpU-qI-ard"/>
+                                    <action selector="play:" destination="t1T-oq-GRV" eventType="touchDown" id="a1P-gP-qqP"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="UQm-YK-2w0"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="5tb-Yk-744" firstAttribute="top" secondItem="j2A-Pd-hJQ" secondAttribute="bottom" constant="55" id="0AP-Bo-dJd"/>
+                            <constraint firstItem="5tb-Yk-744" firstAttribute="centerX" secondItem="Vpv-oz-3Gv" secondAttribute="centerX" id="133-vu-Z8t"/>
+                            <constraint firstItem="j2A-Pd-hJQ" firstAttribute="centerX" secondItem="Vpv-oz-3Gv" secondAttribute="centerX" id="a5B-G5-Ljh"/>
+                            <constraint firstItem="j2A-Pd-hJQ" firstAttribute="top" secondItem="UQm-YK-2w0" secondAttribute="top" constant="53" id="jMN-Oi-xrh"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="YV6-Ie-OE1"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="RmK-26-juN" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="959" y="992"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="FCx-2N-LNp"/>
+        <segue reference="oTn-KB-4iD"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="paperplane" catalog="system" width="128" height="118"/>

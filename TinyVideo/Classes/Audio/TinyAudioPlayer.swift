@@ -12,17 +12,26 @@ import AVFoundation
 
 public class TinyAudioPlayer:AudioConsumerProtocol{
     
+    public init(){
+        
+    }
+    
     var threadQueue:DispatchQueue =  DispatchQueue(label: "TinyAudioPlayer.threadQueue")
     
     public weak var input: AudioInputProtocol?
+    
+    var len:Int64 = 0
     
     var workingBuffers:Set<AudioQueueBufferRef> = Set()
     
     var description:AudioStreamBasicDescription = AudioStreamBasicDescription()
     
     private func createBuffer(buffer:TinyAudioBuffer)->AudioQueueBufferRef?{
+        
         var abuffer:AudioQueueBufferRef?
+        
         let size:UInt32 = UInt32(buffer.data.count)
+        
         AudioQueueAllocateBuffer(self.audioQueue!, size, &abuffer)
         guard let audio = abuffer else { return nil }
         audio.pointee.mAudioDataByteSize = UInt32(buffer.data.count)
@@ -43,61 +52,87 @@ public class TinyAudioPlayer:AudioConsumerProtocol{
         
 
     public func start() {
-        
-        try? AVAudioSession.sharedInstance().setCategory(.playback)
-        try? AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+        self.len = 0
         guard let inputObj = self.input else { return }
         if self.audioQueue == nil{
             self.description = inputObj.description
             var status = AudioQueueNewOutputWithDispatchQueue(&self.audioQueue, &self.description, 0, self.threadQueue) { (aQueue, buffer) in
                 self.workingBuffers.remove(buffer)
                 AudioQueueFreeBuffer(aQueue, buffer)
+                print("----")
                 if self.isRuning == true {
                     self.enqueueBuffer(inputObj: inputObj, aQueue: aQueue)
                 }
             }
             
             if status != errSecSuccess{
-                print("player start fail")
+                print("player init fail \(status)")
             }
             
             
             
-            status =  AudioQueueStart(self.audioQueue!, nil)
-            self.enqueueBuffer(inputObj: inputObj, aQueue: self.audioQueue!)
-            self.enqueueBuffer(inputObj: inputObj, aQueue: self.audioQueue!)
-            self.enqueueBuffer(inputObj: inputObj, aQueue: self.audioQueue!)
+            
+            self.loadBuffers(count:0, inputObj: inputObj)
+            guard let queue = self.audioQueue else { return }
+            if(self.description.mFormatID != kAudioFormatLinearPCM){
+                status = AudioQueuePrime(queue, 1024, nil)
+                if status != errSecSuccess{
+                    print("player prime fail \(status)")
+                }
+            }
+            status =  AudioQueueStart(queue, nil)
+            
             if status != errSecSuccess{
-                print("player start fail")
+                print("player start fail \(status)")
             }
         }else{
             
-            AudioQueueStart(self.audioQueue!, nil)
+            
             if self.workingBuffers.count == 0{
-                self.enqueueBuffer(inputObj: inputObj, aQueue: self.audioQueue!)
-                self.enqueueBuffer(inputObj: inputObj, aQueue: self.audioQueue!)
-                self.enqueueBuffer(inputObj: inputObj, aQueue: self.audioQueue!)
+                self.loadBuffers(count:0, inputObj: inputObj)
             }
+            guard let queue = self.audioQueue else { return }
+            AudioQueueStart(queue, nil)
         }
         
     }
-    
+    func loadBuffers(count:Int = 0,inputObj:AudioInputProtocol){
+        if(count == 0){
+            while inputObj.hasNext {
+                self.enqueueBuffer(inputObj: inputObj, aQueue: self.audioQueue!)
+            }
+        }
+        for _ in 0 ..< count {
+            self.enqueueBuffer(inputObj: inputObj, aQueue: self.audioQueue!)
+        }
+    }
     func enqueueBuffer(inputObj:AudioInputProtocol,aQueue:AudioQueueRef){
         guard let a = inputObj.getNextAudioBuffer() else { return }
         guard let newbuffer =  self.createBuffer(buffer: a) else { return }
-        AudioQueueEnqueueBuffer(aQueue, newbuffer, 0, nil)
+        if let dsc = a.audioStreamPacketDescription{
+            var desc = dsc
+            desc.mStartOffset = len;
+            AudioQueueEnqueueBuffer(aQueue, newbuffer, 0, &desc)
+        }else{
+            AudioQueueEnqueueBuffer(aQueue, newbuffer, 0, nil)
+        }
+        
         self.workingBuffers.insert(newbuffer);
     }
     
     public func end() {
-        AudioQueueStop(self.audioQueue!,true)
+        guard let queue = self.audioQueue else { return  }
+        AudioQueueStop(queue,true)
     }
     
     public func pause() {
-        AudioQueuePause(self.audioQueue!)
+        guard let queue = self.audioQueue else { return  }
+        AudioQueuePause(queue)
     }
     deinit {
-        AudioQueueDispose(self.audioQueue!, true)
+        
+        guard let queue = self.audioQueue else { return  }
+        AudioQueueDispose(queue, true)
     }
     
 }

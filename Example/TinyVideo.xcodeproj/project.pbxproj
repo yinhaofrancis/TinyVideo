@@ -15,6 +15,7 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		A95C141F260ECCFF0070E2AB /* libswiftWebKit.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A95C141E260ECCF80070E2AB /* libswiftWebKit.tbd */; };
 		A95C1422260ECEAC0070E2AB /* TinyVideoWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95C1421260ECEAC0070E2AB /* TinyVideoWebView.swift */; };
+		A987FCD526157FC200FDF697 /* audioViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A987FCD426157FC200FDF697 /* audioViewController.swift */; };
 		A9CA09852604C678008C4799 /* DownLoadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CA09842604C678008C4799 /* DownLoadViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +38,7 @@
 		A94E71DC25EA98B20011C760 /* TinyVideo_Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TinyVideo_Example.entitlements; sourceTree = "<group>"; };
 		A95C141E260ECCF80070E2AB /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
 		A95C1421260ECEAC0070E2AB /* TinyVideoWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinyVideoWebView.swift; sourceTree = "<group>"; };
+		A987FCD426157FC200FDF697 /* audioViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = audioViewController.swift; sourceTree = "<group>"; };
 		A9CA09842604C678008C4799 /* DownLoadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownLoadViewController.swift; sourceTree = "<group>"; };
 		B29429AB8584851EA7DA1AF0 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -77,6 +79,7 @@
 		607FACD21AFB9204008FA782 /* Example for TinyVideo */ = {
 			isa = PBXGroup;
 			children = (
+				A987FCD426157FC200FDF697 /* audioViewController.swift */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -247,6 +250,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A987FCD526157FC200FDF697 /* audioViewController.swift in Sources */,
 				A9CA09852604C678008C4799 /* DownLoadViewController.swift in Sources */,
 				A95C1422260ECEAC0070E2AB /* TinyVideoWebView.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,

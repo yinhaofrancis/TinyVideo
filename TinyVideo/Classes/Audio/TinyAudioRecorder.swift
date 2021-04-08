@@ -37,8 +37,8 @@ public class TinyAudioRecorder:AudioProducerProtocol{
         let status = AudioQueueNewInputWithDispatchQueue(&self.audioQueue, &self.audioStreamDescription, 0, self.threadQueue, { (queue, audio, time, flag, disc) in
             if(audio.pointee.mAudioDataByteSize > 0){
                 let data = Data(bytes: audio.pointee.mAudioData, count: Int(audio.pointee.mAudioDataByteSize))
-                
-                self.output?.handleAudioBuffer(node:self, buffer: TinyAudioBuffer(data: data, time: time.pointee, audioStreamPacketDescription: disc?.pointee))
+                let a:AudioTimeStamp = time.pointee
+                self.output?.handleAudioBuffer(node:self, buffer: TinyAudioBuffer(data: data, time: a, audioStreamPacketDescription: disc?.pointee))
             }
             
             if self.isRuning{
@@ -79,8 +79,6 @@ public class TinyAudioRecorder:AudioProducerProtocol{
     }
     public func start() {
         if(self.isRuning == false){
-            try? AVAudioSession.sharedInstance().setCategory(.record)
-            try? AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
             TinyAudioRecorder.requestAuth { (a) in
                 if(a){
                     self.configAudioBuffers()
@@ -99,25 +97,31 @@ public class TinyAudioRecorder:AudioProducerProtocol{
         get {
             var c:UInt32 = 0
             var data:UInt32 = 0
-            AudioQueueGetProperty(self.audioQueue!, kAudioQueueProperty_IsRunning, &data, &c);
+            guard let queue = self.audioQueue else { return false}
+            AudioQueueGetProperty(queue, kAudioQueueProperty_IsRunning, &data, &c);
             return data != 0
         }
     }
     public func end(){
-        AudioQueueStop(self.audioQueue!, true)
+        guard let queue = self.audioQueue else { return }
+        AudioQueueStop(queue, true)
+        self.output?.handleStreamFinish()
     }
     public func pause(){
-        AudioQueuePause(self.audioQueue!)
+        guard let queue = self.audioQueue else { return }
+        AudioQueuePause(queue)
     }
     public var volume:Float{
         set{
             var v = newValue
-            AudioQueueSetProperty(self.audioQueue!, kAudioQueueParam_Volume, &v, UInt32(MemoryLayout<Float>.size))
+            guard let queue = self.audioQueue else { return }
+            AudioQueueSetProperty(queue, kAudioQueueParam_Volume, &v, UInt32(MemoryLayout<Float>.size))
         }
         get{
             var v:Float = 0
             var c:UInt32 = 0
-            AudioQueueGetProperty(self.audioQueue!, kAudioQueueParam_Volume, &v, &c)
+            guard let queue = self.audioQueue else { return 0}
+            AudioQueueGetProperty(queue, kAudioQueueParam_Volume, &v, &c)
             return v
         }
     }
