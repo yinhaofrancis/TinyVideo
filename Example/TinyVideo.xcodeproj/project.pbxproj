@@ -13,8 +13,12 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		A927069E2628690400496C19 /* WebSourceDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A927069C2628690400496C19 /* WebSourceDownloader.swift */; };
+		A927069F2628690400496C19 /* WebSourceCookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = A927069D2628690400496C19 /* WebSourceCookie.swift */; };
 		A95C141F260ECCFF0070E2AB /* libswiftWebKit.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A95C141E260ECCF80070E2AB /* libswiftWebKit.tbd */; };
 		A95C1422260ECEAC0070E2AB /* TinyVideoWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95C1421260ECEAC0070E2AB /* TinyVideoWebView.swift */; };
+		A986FA4C26267B89003E6D91 /* WebImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A986FA4A26267B89003E6D91 /* WebImage.swift */; };
+		A986FA4D26267B89003E6D91 /* WebSourceDiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A986FA4B26267B89003E6D91 /* WebSourceDiskStorage.swift */; };
 		A987FCD526157FC200FDF697 /* audioViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A987FCD426157FC200FDF697 /* audioViewController.swift */; };
 		A9CA09852604C678008C4799 /* DownLoadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CA09842604C678008C4799 /* DownLoadViewController.swift */; };
 /* End PBXBuildFile section */
@@ -35,9 +39,13 @@
 		7D0BAC7E1E66F3FFB5E01282 /* TinyVideo.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TinyVideo.podspec; path = ../TinyVideo.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		886C58040B90AE86222DA943 /* Pods-TinyVideo_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TinyVideo_Example.debug.xcconfig"; path = "Target Support Files/Pods-TinyVideo_Example/Pods-TinyVideo_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		A19F998ABF2D885E5994278F /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		A927069C2628690400496C19 /* WebSourceDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSourceDownloader.swift; sourceTree = "<group>"; };
+		A927069D2628690400496C19 /* WebSourceCookie.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSourceCookie.swift; sourceTree = "<group>"; };
 		A94E71DC25EA98B20011C760 /* TinyVideo_Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TinyVideo_Example.entitlements; sourceTree = "<group>"; };
 		A95C141E260ECCF80070E2AB /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
 		A95C1421260ECEAC0070E2AB /* TinyVideoWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinyVideoWebView.swift; sourceTree = "<group>"; };
+		A986FA4A26267B89003E6D91 /* WebImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebImage.swift; sourceTree = "<group>"; };
+		A986FA4B26267B89003E6D91 /* WebSourceDiskStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSourceDiskStorage.swift; sourceTree = "<group>"; };
 		A987FCD426157FC200FDF697 /* audioViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = audioViewController.swift; sourceTree = "<group>"; };
 		A9CA09842604C678008C4799 /* DownLoadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownLoadViewController.swift; sourceTree = "<group>"; };
 		B29429AB8584851EA7DA1AF0 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -82,6 +90,10 @@
 				A987FCD426157FC200FDF697 /* audioViewController.swift */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
+				A986FA4A26267B89003E6D91 /* WebImage.swift */,
+				A927069D2628690400496C19 /* WebSourceCookie.swift */,
+				A927069C2628690400496C19 /* WebSourceDownloader.swift */,
+				A986FA4B26267B89003E6D91 /* WebSourceDiskStorage.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				A9CA09842604C678008C4799 /* DownLoadViewController.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
@@ -252,6 +264,10 @@
 			files = (
 				A987FCD526157FC200FDF697 /* audioViewController.swift in Sources */,
 				A9CA09852604C678008C4799 /* DownLoadViewController.swift in Sources */,
+				A927069F2628690400496C19 /* WebSourceCookie.swift in Sources */,
+				A927069E2628690400496C19 /* WebSourceDownloader.swift in Sources */,
+				A986FA4D26267B89003E6D91 /* WebSourceDiskStorage.swift in Sources */,
+				A986FA4C26267B89003E6D91 /* WebImage.swift in Sources */,
 				A95C1422260ECEAC0070E2AB /* TinyVideoWebView.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
@@ -399,7 +415,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = TinyVideo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -427,7 +443,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = TinyVideo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

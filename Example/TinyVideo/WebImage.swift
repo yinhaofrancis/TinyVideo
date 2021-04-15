@@ -15,8 +15,12 @@ public protocol WebSourceStorage{
     var size:UInt64 { get set }
     var resourceType:String { get set }
     var isComplete:Bool { get }
+    func complete(range:ClosedRange<UInt64>)->Bool
+    var percent:Float { get }
     var dataRanges:[ClosedRange<UInt64>] {get}
-    
+    func delete() throws
+    func close() throws
+    var dataHeader:WebSourceHeaderData { get set }
 }
 
 public protocol WebImageDisplay:class{
@@ -51,9 +55,4 @@ public class WebImageManager{
     }
 
     private var imageDisplayMap:[String:WebImageObject] = [:]
-}
-
-public class WebSourceDownload{
-    static let session:URLSession = URLSession(configuration: .default)
-    
 }
